@@ -1,11 +1,19 @@
 #pragma once
 #include <functional>
 
+namespace views
+{
+    template <typename T>
+    class prefix_view;
+}
+
 namespace containers
 {
     template <typename T>
     class binary_node
     {
+        friend class views::prefix_view<T>;
+
     public:
         binary_node(T value, std::function<int(T, T)> comparer)
                 : value_(value), comparer_(comparer)
@@ -13,10 +21,12 @@ namespace containers
         }
 
         void value(T v) { value_ = v; }
+
         void add(T v);
         void remove(T v);
 
         [[nodiscard]] T value() const { return value_; }
+
         [[nodiscard]] bool exists(T v) const;
 
     private:
@@ -27,9 +37,13 @@ namespace containers
 
         [[nodiscard]] bool left_contains(T v) const;
         [[nodiscard]] bool right_contains(T v) const;
+
         [[nodiscard]] bool has_children() const { return left_ || right_; }
+
         [[nodiscard]] bool has_both_children() const { return left_ && right_; }
+
         [[nodiscard]] bool has_left_child() const { return left_; }
+
         [[nodiscard]] bool has_right_child() const { return right_; }
 
         void left_insert(T v);

@@ -8,5 +8,11 @@ int main()
     tree.add(4);
     tree.add(6);
 
-    std::cout << tree.exists(6) << tree.exists(8);
+    auto view = tree.create_prefix_view();
+    for (auto it = view.cbegin();
+         it < view.cend();
+         ++it)
+    {
+        std::cout << *it;
+    }
 }

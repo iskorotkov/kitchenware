@@ -2,12 +2,21 @@
 #include <memory>
 #include <functional>
 #include "binary_node.h"
+#include "prefix_view.h"
+
+//namespace views
+//{
+//    template <typename T>
+//    class prefix_view;
+//}
 
 namespace containers
 {
     template <typename T>
     class binary_tree final
     {
+        friend class views::prefix_view<T>;
+
     public:
         binary_tree() = default;
 
@@ -19,8 +28,9 @@ namespace containers
         void remove(T value);
         [[nodiscard]] bool exists(T value) const;
 
+        [[nodiscard]] views::prefix_view<T> create_prefix_view() const { return views::prefix_view<T>(this); }
+
         // TODO: Add views
-//        [[nodiscard]] prefix_view create_prefix_view() const;
 //        [[nodiscard]] infix_view create_infix_view() const;
 //        [[nodiscard]] postfix_view create_postfix_view() const;
 

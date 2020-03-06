@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 include_directories(containers)
 include_directories(kitchen)
+include_directories(views)
 
 add_executable(kitchenware
         containers/binary_tree.h
@@ -20,4 +21,6 @@ add_executable(kitchenware
         kitchen/slow_cooker.h
         kitchen/stove.cpp
         kitchen/stove.h
-        main.cpp containers/binary_node.h)
+        containers/binary_node.h
+        views/prefix_view.h
+        main.cpp)
