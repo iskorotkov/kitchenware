@@ -27,8 +27,8 @@ namespace containers::views
                 }
             }
 
-            iterator& operator++(); // prefix
-            iterator operator++(int); // postfix
+            auto& operator++(); // prefix
+            auto operator++(int); // postfix
 
             // TODO: add decrement operators
 
@@ -65,16 +65,16 @@ namespace containers::views
         {
         }
 
-        iterator begin() { return iterator(tree_); }
+        auto begin() { return iterator(tree_); }
 
-        iterator end() { return iterator(tree_, true); }
+        auto end() { return iterator(tree_, true); }
 
     private:
         const containers::binary_tree<TValue, TKey>* tree_;
     };
 
     template <typename TValue, typename TKey>
-    typename prefix_view<TValue, TKey>::iterator& prefix_view<TValue, TKey>::iterator::operator++()
+    auto& prefix_view<TValue, TKey>::iterator::operator++()
     {
         check_stack_has_values();
 
@@ -114,7 +114,7 @@ namespace containers::views
     }
 
     template <typename TValue, typename TKey>
-    typename prefix_view<TValue, TKey>::iterator prefix_view<TValue, TKey>::iterator::operator++(int)
+    auto prefix_view<TValue, TKey>::iterator::operator++(int)
     {
         // TODO operator++ for iterator
     }
@@ -162,14 +162,14 @@ namespace containers::views
     }
 
     template <typename TValue, typename TKey>
-    inline bool prefix_view<TValue, TKey>::iterator::operator==(const prefix_view::iterator& other) const
+    bool prefix_view<TValue, TKey>::iterator::operator==(const prefix_view::iterator& other) const
     {
         return (has_value() && other.has_value() && this->value() == other.value())
             || (!has_value() && !other.has_value());
     }
 
     template <typename TValue, typename TKey>
-    inline bool prefix_view<TValue, TKey>::iterator::operator!=(const prefix_view::iterator& other) const
+    bool prefix_view<TValue, TKey>::iterator::operator!=(const prefix_view::iterator& other) const
     {
         return !this->operator==(other);
     }

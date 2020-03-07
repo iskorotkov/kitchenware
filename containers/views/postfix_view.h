@@ -27,8 +27,8 @@ namespace containers::views
                 }
             }
 
-            iterator& operator++(); // prefix
-            iterator operator++(int); // postfix
+            auto& operator++(); // prefix
+            auto operator++(int); // postfix
 
             // TODO: add decrement operators
 
@@ -65,16 +65,16 @@ namespace containers::views
         {
         }
 
-        iterator begin() { return iterator(tree_); }
+        auto begin() { return iterator(tree_); }
 
-        iterator end() { return iterator(tree_, true); }
+        auto end() { return iterator(tree_, true); }
 
     private:
         const containers::binary_tree<TValue, TKey>* tree_;
     };
 
     template <typename TValue, typename TKey>
-    typename postfix_view<TValue, TKey>::iterator& postfix_view<TValue, TKey>::iterator::operator++()
+    auto& postfix_view<TValue, TKey>::iterator::operator++()
     {
         check_stack_has_values();
 
@@ -114,7 +114,7 @@ namespace containers::views
     }
 
     template <typename TValue, typename TKey>
-    typename postfix_view<TValue, TKey>::iterator postfix_view<TValue, TKey>::iterator::operator++(int)
+    auto postfix_view<TValue, TKey>::iterator::operator++(int)
     {
         // TODO operator++ for iterator
     }
