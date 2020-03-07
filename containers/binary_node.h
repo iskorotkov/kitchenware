@@ -28,7 +28,7 @@ namespace containers
         void add(TValue v);
         void remove(TKey key);
 
-        [[nodiscard]] const TKey& key() { return hash_(value_); }
+        [[nodiscard]] TKey key() { return hash_(value_); }
 
         [[nodiscard]] const TValue& value() const { return value_; }
 
