@@ -28,9 +28,9 @@ namespace containers
         void remove(TKey key);
         [[nodiscard]] bool exists(TKey key) const;
 
-        [[nodiscard]] views::prefix_view<TValue, TKey> create_prefix_view() const { return views::prefix_view<TValue, TKey>(this); }
-        [[nodiscard]] views::infix_view<TValue, TKey> create_infix_view() const { return views::infix_view<TValue, TKey>(this); }
-        [[nodiscard]] views::postfix_view<TValue, TKey> create_postfix_view() const { return views::postfix_view<TValue, TKey>(this); };
+        [[nodiscard]] auto create_prefix_view() const { return views::prefix_view<TValue, TKey>(this); }
+        [[nodiscard]] auto create_infix_view() const { return views::infix_view<TValue, TKey>(this); }
+        [[nodiscard]] auto create_postfix_view() const { return views::postfix_view<TValue, TKey>(this); };
 
     private:
         std::unique_ptr<binary_node<TValue, TKey>> root_;
