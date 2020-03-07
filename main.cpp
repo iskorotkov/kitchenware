@@ -3,7 +3,7 @@
 
 int main()
 {
-    containers::binary_tree<int, int> tree;
+    containers::binary_tree<int, int> tree([](auto i) { return -i; });
     tree.add(5);
     tree.add(4);
     tree.add(6);

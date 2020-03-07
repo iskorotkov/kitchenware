@@ -21,8 +21,8 @@ namespace containers
         }
 
         void add(TValue value);
-        void remove(TValue value);
-        [[nodiscard]] bool exists(TValue value) const;
+        void remove(TKey key);
+        [[nodiscard]] bool exists(TKey key) const;
 
         [[nodiscard]] views::prefix_view<TValue, TKey> create_prefix_view() const { return views::prefix_view<TValue, TKey>(this); }
 
@@ -37,7 +37,7 @@ namespace containers
 }
 
 template <typename TValue, typename TKey>
-void containers::binary_tree<TValue, TKey>::remove(TValue value)
+void containers::binary_tree<TValue, TKey>::remove(TKey key)
 {
     if (auto root = root_.get())
     {
@@ -46,7 +46,7 @@ void containers::binary_tree<TValue, TKey>::remove(TValue value)
 }
 
 template <typename TValue, typename TKey>
-bool containers::binary_tree<TValue, TKey>::exists(TValue value) const
+bool containers::binary_tree<TValue, TKey>::exists(TKey key) const
 {
     if (const auto root = root_.get())
     {

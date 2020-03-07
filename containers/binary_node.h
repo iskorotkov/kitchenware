@@ -24,12 +24,15 @@ namespace containers
 
         TValue& value() { return value_; }
 
+
         void add(TValue v);
-        void remove(TValue v);
+        void remove(TKey key);
+
+        [[nodiscard]] const TKey& key() { return hash_(value_); }
 
         [[nodiscard]] const TValue& value() const { return value_; }
 
-        [[nodiscard]] bool exists(TValue v) const;
+        [[nodiscard]] bool exists(TKey k) const;
 
     private:
         TValue value_;
@@ -37,8 +40,8 @@ namespace containers
         std::unique_ptr<binary_node<TValue, TKey>> left_;
         std::unique_ptr<binary_node<TValue, TKey>> right_;
 
-        [[nodiscard]] bool left_contains(TValue v) const;
-        [[nodiscard]] bool right_contains(TValue v) const;
+        [[nodiscard]] bool left_contains(TKey k) const;
+        [[nodiscard]] bool right_contains(TKey k) const;
 
         [[nodiscard]] bool has_children() const { return left_ || right_; }
 
@@ -48,8 +51,8 @@ namespace containers
 
         [[nodiscard]] bool has_right_child() const { return right_; }
 
-        void left_insert(TValue v);
-        void right_insert(TValue v);
+        void left_remove(TKey k);
+        void right_remove(TKey k);
         void remove_node();
     };
 }
@@ -57,7 +60,8 @@ namespace containers
 template <typename TValue, typename TKey>
 void containers::binary_node<TValue, TKey>::add(TValue v)
 {
-    if (v < value_)
+    auto k = hash_(v);
+    if (k < key())
     {
         if (left_)
         {
@@ -68,7 +72,7 @@ void containers::binary_node<TValue, TKey>::add(TValue v)
             left_ = std::make_unique<binary_node<TValue, TKey>>(v, hash_);
         }
     }
-    else if (v > value_)
+    else if (k > key())
     {
         if (right_)
         {
@@ -82,15 +86,15 @@ void containers::binary_node<TValue, TKey>::add(TValue v)
 }
 
 template <typename TValue, typename TKey>
-void containers::binary_node<TValue, TKey>::remove(TValue v)
+void containers::binary_node<TValue, TKey>::remove(TKey k)
 {
-    if (v < value_)
+    if (k < key())
     {
-        left_insert(v);
+        left_remove(k);
     }
-    else if (v > value_)
+    else if (k > key())
     {
-        right_insert(v);
+        right_remove(v);
     }
     else // v == value_
     {
@@ -99,11 +103,11 @@ void containers::binary_node<TValue, TKey>::remove(TValue v)
 }
 
 template <typename TValue, typename TKey>
-void containers::binary_node<TValue, TKey>::left_insert(TValue v)
+void containers::binary_node<TValue, TKey>::left_remove(TKey k)
 {
     if (this->left_)
     {
-        if (this->left_->value_ == v)
+        if (this->left_->value_ == k)
         {
             if (!this->left_->has_children())
             {
@@ -114,25 +118,25 @@ void containers::binary_node<TValue, TKey>::left_insert(TValue v)
 }
 
 template <typename TValue, typename TKey>
-bool containers::binary_node<TValue, TKey>::exists(TValue v) const
+bool containers::binary_node<TValue, TKey>::exists(TKey k) const
 {
-    return value_ == v || left_contains(v) || right_contains(v);
+    return key() == k || left_contains(k) || right_contains(k);
 }
 
 template <typename TValue, typename TKey>
-bool containers::binary_node<TValue, TKey>::left_contains(TValue v) const
+bool containers::binary_node<TValue, TKey>::left_contains(TKey k) const
 {
-    return v < value_ && left_ && left_->exists(v);
+    return key() < value_ && left_ && left_->exists(k);
 }
 
 template <typename TValue, typename TKey>
-bool containers::binary_node<TValue, TKey>::right_contains(TValue v) const
+bool containers::binary_node<TValue, TKey>::right_contains(TKey k) const
 {
-    return v > value_ && right_ && right_->exists(v);
+    return key() > value_ && right_ && right_->exists(k);
 }
 
 template <typename TValue, typename TKey>
-void containers::binary_node<TValue, TKey>::right_insert(TValue v)
+void containers::binary_node<TValue, TKey>::right_remove(TKey k)
 {
 }
 
