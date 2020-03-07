@@ -78,14 +78,14 @@ namespace containers::views
     {
         check_stack_has_values();
 
-        // Can move to the right
-        if (auto node = stack_.top()->right_.get())
+        // Can move to the left
+        if (auto node = stack_.top()->left_.get())
         {
-            // Add every value in left subtrees and descend to the left-most node
+            // Add every value in right subtrees and descend to the right-most node
             while (node)
             {
                 stack_.push(node);
-                node = node->left_.get();
+                node = node->right_.get();
             }
         }
         else
@@ -101,7 +101,7 @@ namespace containers::views
             }
 
             // Ascend to uppermost node (if exists)
-            while (!stack_.empty() && cur->right_ && cur->right_.get() == prev)
+            while (!stack_.empty() && cur->left_ && cur->left_.get() == prev)
             {
                 prev = cur;
                 stack_.pop();
@@ -126,7 +126,7 @@ namespace containers::views
         while (node)
         {
             stack_.push(node);
-            node = node->left_.get();
+            node = node->right_.get();
         }
     }
 
