@@ -107,7 +107,10 @@ namespace containers::views
                 stack_.pop();
 
                 // Get parent node if exists
-                cur = stack_.empty() ? nullptr : stack_.top();
+                if (!stack_.empty())
+                {
+                    cur = stack_.top();
+                }
             }
         }
         return *this;
