@@ -3,6 +3,9 @@ project(kitchenware)
 
 set(CMAKE_CXX_STANDARD 17)
 
+set(CMAKE_C_COMPILER "C:/Users/korot/scoop/apps/llvm/9.0.0/bin/clang.exe")
+set(CMAKE_CXX_COMPILER "C:/Users/korot/scoop/apps/llvm/9.0.0/bin/clang++.exe")
+
 include_directories(containers)
 include_directories(kitchen)
 include_directories(containers/views)
