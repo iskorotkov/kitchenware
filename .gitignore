@@ -1,4 +1,5 @@
 /out/
+/build/
 /cmake-build-debug/
 /.vs/
 /.vscode/

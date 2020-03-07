@@ -1,7 +1,7 @@
 #pragma once
 #include <functional>
 
-namespace views
+namespace containers::views
 {
     template <typename T>
     class prefix_view;
@@ -12,7 +12,7 @@ namespace containers
     template <typename T>
     class binary_node
     {
-        friend class views::prefix_view<T>;
+        friend class containers::views::prefix_view<T>;
 
     public:
         binary_node(T value, std::function<int(T, T)> comparer)
