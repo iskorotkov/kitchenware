@@ -1,6 +1,5 @@
 #pragma once
 #include <stack>
-#include <binary_tree.h>
 #include "binary_tree.h"
 #include "binary_node.h"
 
@@ -10,16 +9,16 @@ namespace containers
     class binary_tree;
 }
 
-namespace views
+namespace containers::views
 {
     template <typename T>
     class prefix_view
     {
     public:
-        class const_iterator
+        class iterator
         {
         public:
-            explicit const_iterator(const containers::binary_tree<T>* tree, bool end = false)
+            explicit iterator(const containers::binary_tree<T>* tree, bool end = false)
                     : tree_(tree)
             {
                 if (!end)
@@ -28,19 +27,27 @@ namespace views
                 }
             }
 
-            const_iterator& operator++(); // prefix
-            const_iterator operator++(int); // postfix
+            iterator& operator++(); // prefix
+            iterator operator++(int); // postfix
 
             // TODO: add decrement operators
 
-            T operator*() const;
+            T& operator*() { return value(); }
+
+            const T& operator*() const { return value(); }
+
+            T& value();
 
             // TODO: add other comparison operators
-            [[nodiscard]] bool operator<(const prefix_view::const_iterator& other) const;
+            [[nodiscard]] bool operator<(const iterator& other) const;
+
+            [[nodiscard]] bool operator==(const iterator& other) const;
+
+            [[nodiscard]] bool operator!=(const iterator& other) const;
 
             [[nodiscard]] int level() const { return stack_.size(); }
 
-            [[nodiscard]] T value() const;
+            [[nodiscard]] const T& value() const;
 
         private:
             const containers::binary_tree<T>* tree_;
@@ -51,30 +58,23 @@ namespace views
             [[nodiscard]] bool has_value() const { return !stack_.empty(); }
 
             void check_stack_has_values() const;
-            void check_has_same_tree(const const_iterator& other) const;
-        };
-
-        class const_reverse_iterator
-        {
+            void check_has_same_tree(const iterator& other) const;
         };
 
         prefix_view(const containers::binary_tree<T>* tree) : tree_(tree)
         {
         }
 
-        virtual const_iterator cbegin() const { return const_iterator(tree_); }
+        iterator begin() { return iterator(tree_); }
 
-        virtual const_iterator cend() const { return const_iterator(tree_, true); }
-
-//        virtual const_reverse_iterator<T> crbegin() const;
-//        virtual const_reverse_iterator<T> crend() const;
+        iterator end() { return iterator(tree_, true); }
 
     private:
         const containers::binary_tree<T>* tree_;
     };
 
     template <typename T>
-    typename prefix_view<T>::const_iterator& prefix_view<T>::const_iterator::operator++()
+    typename prefix_view<T>::iterator& prefix_view<T>::iterator::operator++()
     {
         check_stack_has_values();
 
@@ -90,30 +90,37 @@ namespace views
         }
         else
         {
+            // Get current node
             auto prev = stack_.top();
             stack_.pop();
             decltype(prev) cur = nullptr;
+
             if (!stack_.empty())
             {
                 cur = stack_.top();
             }
+
+            // Ascend to uppermost node (if exists)
             while (!stack_.empty() && cur->right_ && cur->right_.get() == prev)
             {
                 prev = cur;
-                cur = stack_.top();
                 stack_.pop();
+
+                // Get parent node if exists
+                cur = stack_.empty() ? nullptr : stack_.top();
             }
         }
         return *this;
     }
 
     template <typename T>
-    typename prefix_view<T>::const_iterator prefix_view<T>::const_iterator::operator++(int)
+    typename prefix_view<T>::iterator prefix_view<T>::iterator::operator++(int)
     {
+        // TODO operator++ for iterator
     }
 
     template <typename T>
-    void prefix_view<T>::const_iterator::first()
+    void prefix_view<T>::iterator::first()
     {
         auto node = tree_->root_.get();
         while (node)
@@ -124,20 +131,14 @@ namespace views
     }
 
     template <typename T>
-    T prefix_view<T>::const_iterator::operator*() const
-    {
-        return value();
-    }
-
-    template <typename T>
-    T prefix_view<T>::const_iterator::value() const
+    const T& prefix_view<T>::iterator::value() const
     {
         check_stack_has_values();
         return stack_.top()->value();
     }
 
     template <typename T>
-    void prefix_view<T>::const_iterator::check_stack_has_values() const
+    void prefix_view<T>::iterator::check_stack_has_values() const
     {
         if (stack_.empty())
         {
@@ -147,14 +148,34 @@ namespace views
     }
 
     template <typename T>
-    bool prefix_view<T>::const_iterator::operator<(const prefix_view::const_iterator& other) const
+    T& prefix_view<T>::iterator::value()
     {
-        return has_value()
-               && (!other.has_value() || this->value() < other.value());
+        check_stack_has_values();
+        return stack_.top()->value();
     }
 
     template <typename T>
-    void prefix_view<T>::const_iterator::check_has_same_tree(const prefix_view::const_iterator& other) const
+    bool prefix_view<T>::iterator::operator<(const prefix_view::iterator& other) const
+    {
+        return has_value()
+            && (!other.has_value() || this->value() < other.value());
+    }
+
+    template<typename T>
+    inline bool prefix_view<T>::iterator::operator==(const prefix_view::iterator& other) const
+    {
+        return has_value() && other.has_value() && this->value() == other.value()
+            || !has_value() && !other.has_value();
+    }
+
+    template<typename T>
+    inline bool prefix_view<T>::iterator::operator!=(const prefix_view::iterator& other) const
+    {
+        return !this->operator==(other);
+    }
+
+    template <typename T>
+    void prefix_view<T>::iterator::check_has_same_tree(const prefix_view::iterator& other) const
     {
         if (tree_ != other.tree_)
         {

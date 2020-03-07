@@ -22,10 +22,12 @@ namespace containers
 
         void value(T v) { value_ = v; }
 
+        T& value() { return value_; }
+
         void add(T v);
         void remove(T v);
 
-        [[nodiscard]] T value() const { return value_; }
+        [[nodiscard]] const T& value() const { return value_; }
 
         [[nodiscard]] bool exists(T v) const;
 

@@ -4,12 +4,6 @@
 #include "binary_node.h"
 #include "prefix_view.h"
 
-//namespace views
-//{
-//    template <typename T>
-//    class prefix_view;
-//}
-
 namespace containers
 {
     template <typename T>
