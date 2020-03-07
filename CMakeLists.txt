@@ -26,4 +26,6 @@ add_executable(kitchenware
         kitchen/stove.h
         containers/binary_node.h
         containers/views/prefix_view.h
+        containers/views/postfix_view.h
+        containers/views/infix_view.h
         main.cpp)

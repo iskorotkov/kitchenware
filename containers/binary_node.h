@@ -5,6 +5,12 @@ namespace containers::views
 {
     template <typename TValue, typename TKey>
     class prefix_view;
+
+    template <typename TValue, typename TKey>
+    class postfix_view;
+
+    template <typename TValue, typename TKey>
+    class infix_view;
 }
 
 namespace containers
@@ -13,6 +19,8 @@ namespace containers
     class binary_node
     {
         friend class containers::views::prefix_view<TValue, TKey>;
+        friend class containers::views::postfix_view<TValue, TKey>;
+        friend class containers::views::infix_view<TValue, TKey>;
 
     public:
         binary_node(TValue value, std::function<TKey(TValue)> comparer)

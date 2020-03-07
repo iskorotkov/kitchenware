@@ -3,6 +3,8 @@
 #include <functional>
 #include "binary_node.h"
 #include "prefix_view.h"
+#include "postfix_view.h"
+#include "infix_view.h"
 
 namespace containers
 {
@@ -10,6 +12,8 @@ namespace containers
     class binary_tree final
     {
         friend class views::prefix_view<TValue, TKey>;
+        friend class views::postfix_view<TValue, TKey>;
+        friend class views::infix_view<TValue, TKey>;
 
     public:
         binary_tree() : hash_([](auto value) { return value; })
@@ -25,10 +29,8 @@ namespace containers
         [[nodiscard]] bool exists(TKey key) const;
 
         [[nodiscard]] views::prefix_view<TValue, TKey> create_prefix_view() const { return views::prefix_view<TValue, TKey>(this); }
-
-        // TODO: Add views
-//        [[nodiscard]] infix_view create_infix_view() const;
-//        [[nodiscard]] postfix_view create_postfix_view() const;
+        [[nodiscard]] views::infix_view<TValue, TKey> create_infix_view() const { return views::infix_view<TValue, TKey>(this); }
+        [[nodiscard]] views::postfix_view<TValue, TKey> create_postfix_view() const { return views::postfix_view<TValue, TKey>(this); };
 
     private:
         std::unique_ptr<binary_node<TValue, TKey>> root_;
