@@ -6,36 +6,38 @@
 
 namespace containers
 {
-    template <typename T>
+    template <typename TValue, typename TKey>
     class binary_tree final
     {
-        friend class views::prefix_view<T>;
+        friend class views::prefix_view<TValue, TKey>;
 
     public:
-        binary_tree() = default;
-
-        explicit binary_tree(std::function<int(T, T)> comparer) : comparer_(comparer)
+        binary_tree() : hash_([](auto value) { return value; })
         {
         }
 
-        void add(T value);
-        void remove(T value);
-        [[nodiscard]] bool exists(T value) const;
+        explicit binary_tree(std::function<TKey(TValue)> comparer) : hash_(comparer)
+        {
+        }
 
-        [[nodiscard]] views::prefix_view<T> create_prefix_view() const { return views::prefix_view<T>(this); }
+        void add(TValue value);
+        void remove(TValue value);
+        [[nodiscard]] bool exists(TValue value) const;
+
+        [[nodiscard]] views::prefix_view<TValue, TKey> create_prefix_view() const { return views::prefix_view<TValue, TKey>(this); }
 
         // TODO: Add views
 //        [[nodiscard]] infix_view create_infix_view() const;
 //        [[nodiscard]] postfix_view create_postfix_view() const;
 
     private:
-        std::unique_ptr<binary_node<T>> root_;
-        std::function<int(T, T)> comparer_;
+        std::unique_ptr<binary_node<TValue, TKey>> root_;
+        std::function<TKey(TValue)> hash_;
     };
 }
 
-template <typename T>
-void containers::binary_tree<T>::remove(T value)
+template <typename TValue, typename TKey>
+void containers::binary_tree<TValue, TKey>::remove(TValue value)
 {
     if (auto root = root_.get())
     {
@@ -43,8 +45,8 @@ void containers::binary_tree<T>::remove(T value)
     }
 }
 
-template <typename T>
-bool containers::binary_tree<T>::exists(T value) const
+template <typename TValue, typename TKey>
+bool containers::binary_tree<TValue, TKey>::exists(TValue value) const
 {
     if (const auto root = root_.get())
     {
@@ -53,8 +55,8 @@ bool containers::binary_tree<T>::exists(T value) const
     return false;
 }
 
-template <typename T>
-void containers::binary_tree<T>::add(T value)
+template <typename TValue, typename TKey>
+void containers::binary_tree<TValue, TKey>::add(TValue value)
 {
     if (auto root = root_.get())
     {
@@ -62,6 +64,6 @@ void containers::binary_tree<T>::add(T value)
     }
     else
     {
-        root_ = std::make_unique<binary_node<T>>(value, comparer_);
+        root_ = std::make_unique<binary_node<TValue, TKey>>(value, hash_);
     }
 }

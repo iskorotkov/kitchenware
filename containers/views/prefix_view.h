@@ -5,20 +5,20 @@
 
 namespace containers
 {
-    template <typename T>
+    template <typename TValue, typename TKey>
     class binary_tree;
 }
 
 namespace containers::views
 {
-    template <typename T>
+    template <typename TValue, typename TKey>
     class prefix_view
     {
     public:
         class iterator
         {
         public:
-            explicit iterator(const containers::binary_tree<T>* tree, bool end = false)
+            explicit iterator(const containers::binary_tree<TValue, TKey>* tree, bool end = false)
                     : tree_(tree)
             {
                 if (!end)
@@ -32,11 +32,11 @@ namespace containers::views
 
             // TODO: add decrement operators
 
-            T& operator*() { return value(); }
+            TValue& operator*() { return value(); }
 
-            const T& operator*() const { return value(); }
+            const TValue& operator*() const { return value(); }
 
-            T& value();
+            TValue& value();
 
             // TODO: add other comparison operators
             [[nodiscard]] bool operator<(const iterator& other) const;
@@ -47,11 +47,11 @@ namespace containers::views
 
             [[nodiscard]] int level() const { return stack_.size(); }
 
-            [[nodiscard]] const T& value() const;
+            [[nodiscard]] const TValue& value() const;
 
         private:
-            const containers::binary_tree<T>* tree_;
-            std::stack<containers::binary_node<T>*> stack_;
+            const containers::binary_tree<TValue, TKey>* tree_;
+            std::stack<containers::binary_node<TValue, TKey>*> stack_;
 
             void first();
 
@@ -61,7 +61,7 @@ namespace containers::views
             void check_has_same_tree(const iterator& other) const;
         };
 
-        prefix_view(const containers::binary_tree<T>* tree) : tree_(tree)
+        prefix_view(const containers::binary_tree<TValue, TKey>* tree) : tree_(tree)
         {
         }
 
@@ -70,11 +70,11 @@ namespace containers::views
         iterator end() { return iterator(tree_, true); }
 
     private:
-        const containers::binary_tree<T>* tree_;
+        const containers::binary_tree<TValue, TKey>* tree_;
     };
 
-    template <typename T>
-    typename prefix_view<T>::iterator& prefix_view<T>::iterator::operator++()
+    template <typename TValue, typename TKey>
+    typename prefix_view<TValue, TKey>::iterator& prefix_view<TValue, TKey>::iterator::operator++()
     {
         check_stack_has_values();
 
@@ -113,14 +113,14 @@ namespace containers::views
         return *this;
     }
 
-    template <typename T>
-    typename prefix_view<T>::iterator prefix_view<T>::iterator::operator++(int)
+    template <typename TValue, typename TKey>
+    typename prefix_view<TValue, TKey>::iterator prefix_view<TValue, TKey>::iterator::operator++(int)
     {
         // TODO operator++ for iterator
     }
 
-    template <typename T>
-    void prefix_view<T>::iterator::first()
+    template <typename TValue, typename TKey>
+    void prefix_view<TValue, TKey>::iterator::first()
     {
         auto node = tree_->root_.get();
         while (node)
@@ -130,15 +130,15 @@ namespace containers::views
         }
     }
 
-    template <typename T>
-    const T& prefix_view<T>::iterator::value() const
+    template <typename TValue, typename TKey>
+    const TValue& prefix_view<TValue, TKey>::iterator::value() const
     {
         check_stack_has_values();
         return stack_.top()->value();
     }
 
-    template <typename T>
-    void prefix_view<T>::iterator::check_stack_has_values() const
+    template <typename TValue, typename TKey>
+    void prefix_view<TValue, TKey>::iterator::check_stack_has_values() const
     {
         if (stack_.empty())
         {
@@ -147,35 +147,35 @@ namespace containers::views
         }
     }
 
-    template <typename T>
-    T& prefix_view<T>::iterator::value()
+    template <typename TValue, typename TKey>
+    TValue& prefix_view<TValue, TKey>::iterator::value()
     {
         check_stack_has_values();
         return stack_.top()->value();
     }
 
-    template <typename T>
-    bool prefix_view<T>::iterator::operator<(const prefix_view::iterator& other) const
+    template <typename TValue, typename TKey>
+    bool prefix_view<TValue, TKey>::iterator::operator<(const prefix_view::iterator& other) const
     {
         return has_value()
             && (!other.has_value() || this->value() < other.value());
     }
 
-    template<typename T>
-    inline bool prefix_view<T>::iterator::operator==(const prefix_view::iterator& other) const
+    template <typename TValue, typename TKey>
+    inline bool prefix_view<TValue, TKey>::iterator::operator==(const prefix_view::iterator& other) const
     {
-        return has_value() && other.has_value() && this->value() == other.value()
-            || !has_value() && !other.has_value();
+        return (has_value() && other.has_value() && this->value() == other.value())
+            || (!has_value() && !other.has_value());
     }
 
-    template<typename T>
-    inline bool prefix_view<T>::iterator::operator!=(const prefix_view::iterator& other) const
+    template <typename TValue, typename TKey>
+    inline bool prefix_view<TValue, TKey>::iterator::operator!=(const prefix_view::iterator& other) const
     {
         return !this->operator==(other);
     }
 
-    template <typename T>
-    void prefix_view<T>::iterator::check_has_same_tree(const prefix_view::iterator& other) const
+    template <typename TValue, typename TKey>
+    void prefix_view<TValue, TKey>::iterator::check_has_same_tree(const prefix_view::iterator& other) const
     {
         if (tree_ != other.tree_)
         {

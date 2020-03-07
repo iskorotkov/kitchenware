@@ -3,42 +3,42 @@
 
 namespace containers::views
 {
-    template <typename T>
+    template <typename TValue, typename TKey>
     class prefix_view;
 }
 
 namespace containers
 {
-    template <typename T>
+    template <typename TValue, typename TKey>
     class binary_node
     {
-        friend class containers::views::prefix_view<T>;
+        friend class containers::views::prefix_view<TValue, TKey>;
 
     public:
-        binary_node(T value, std::function<int(T, T)> comparer)
-                : value_(value), comparer_(comparer)
+        binary_node(TValue value, std::function<TKey(TValue)> comparer)
+                : value_(value), hash_(comparer)
         {
         }
 
-        void value(T v) { value_ = v; }
+        void value(TValue v) { value_ = v; }
 
-        T& value() { return value_; }
+        TValue& value() { return value_; }
 
-        void add(T v);
-        void remove(T v);
+        void add(TValue v);
+        void remove(TValue v);
 
-        [[nodiscard]] const T& value() const { return value_; }
+        [[nodiscard]] const TValue& value() const { return value_; }
 
-        [[nodiscard]] bool exists(T v) const;
+        [[nodiscard]] bool exists(TValue v) const;
 
     private:
-        T value_;
-        std::function<int(T, T)> comparer_;
-        std::unique_ptr<binary_node<T>> left_;
-        std::unique_ptr<binary_node<T>> right_;
+        TValue value_;
+        std::function<TKey(TValue)> hash_;
+        std::unique_ptr<binary_node<TValue, TKey>> left_;
+        std::unique_ptr<binary_node<TValue, TKey>> right_;
 
-        [[nodiscard]] bool left_contains(T v) const;
-        [[nodiscard]] bool right_contains(T v) const;
+        [[nodiscard]] bool left_contains(TValue v) const;
+        [[nodiscard]] bool right_contains(TValue v) const;
 
         [[nodiscard]] bool has_children() const { return left_ || right_; }
 
@@ -48,14 +48,14 @@ namespace containers
 
         [[nodiscard]] bool has_right_child() const { return right_; }
 
-        void left_insert(T v);
-        void right_insert(T v);
+        void left_insert(TValue v);
+        void right_insert(TValue v);
         void remove_node();
     };
 }
 
-template <typename T>
-void containers::binary_node<T>::add(T v)
+template <typename TValue, typename TKey>
+void containers::binary_node<TValue, TKey>::add(TValue v)
 {
     if (v < value_)
     {
@@ -65,7 +65,7 @@ void containers::binary_node<T>::add(T v)
         }
         else
         {
-            left_ = std::make_unique<binary_node<T>>(v, comparer_);
+            left_ = std::make_unique<binary_node<TValue, TKey>>(v, hash_);
         }
     }
     else if (v > value_)
@@ -76,13 +76,13 @@ void containers::binary_node<T>::add(T v)
         }
         else
         {
-            right_ = std::make_unique<binary_node<T>>(v, comparer_);
+            right_ = std::make_unique<binary_node<TValue, TKey>>(v, hash_);
         }
     }
 }
 
-template <typename T>
-void containers::binary_node<T>::remove(T v)
+template <typename TValue, typename TKey>
+void containers::binary_node<TValue, TKey>::remove(TValue v)
 {
     if (v < value_)
     {
@@ -98,8 +98,8 @@ void containers::binary_node<T>::remove(T v)
     }
 }
 
-template <typename T>
-void containers::binary_node<T>::left_insert(T v)
+template <typename TValue, typename TKey>
+void containers::binary_node<TValue, TKey>::left_insert(TValue v)
 {
     if (this->left_)
     {
@@ -113,30 +113,30 @@ void containers::binary_node<T>::left_insert(T v)
     }
 }
 
-template <typename T>
-bool containers::binary_node<T>::exists(T v) const
+template <typename TValue, typename TKey>
+bool containers::binary_node<TValue, TKey>::exists(TValue v) const
 {
     return value_ == v || left_contains(v) || right_contains(v);
 }
 
-template <typename T>
-bool containers::binary_node<T>::left_contains(T v) const
+template <typename TValue, typename TKey>
+bool containers::binary_node<TValue, TKey>::left_contains(TValue v) const
 {
     return v < value_ && left_ && left_->exists(v);
 }
 
-template <typename T>
-bool containers::binary_node<T>::right_contains(T v) const
+template <typename TValue, typename TKey>
+bool containers::binary_node<TValue, TKey>::right_contains(TValue v) const
 {
     return v > value_ && right_ && right_->exists(v);
 }
 
-template <typename T>
-void containers::binary_node<T>::right_insert(T v)
+template <typename TValue, typename TKey>
+void containers::binary_node<TValue, TKey>::right_insert(TValue v)
 {
 }
 
-template <typename T>
-void containers::binary_node<T>::remove_node()
+template <typename TValue, typename TKey>
+void containers::binary_node<TValue, TKey>::remove_node()
 {
 }
