@@ -1,71 +1,27 @@
 #pragma once
 #include <memory>
 #include <functional>
-#include "binary_node.h"
-#include "prefix_view.h"
-#include "postfix_view.h"
-#include "infix_view.h"
+#include "binary_tree_base.h"
 
 namespace containers
 {
     template <typename TValue, typename TKey>
-    class binary_tree final
+    class binary_tree final : public binary_tree_base
     {
-        friend class views::prefix_view<TValue, TKey>;
-        friend class views::postfix_view<TValue, TKey>;
-        friend class views::infix_view<TValue, TKey>;
-
     public:
-        binary_tree() : hash_([](auto value) { return value; })
+        binary_tree() :
+            binary_tree_base([](auto value) { return value; },
+                [](auto value) { delete (TValue*)value; })
         {
         }
 
-        explicit binary_tree(std::function<TKey(TValue)> comparer) : hash_(comparer)
+        explicit binary_tree(std::function<TKey(const TValue&)> comparer) :
+            binary_tree_base(comparer, [](auto value) { delete (TValue*)value; })
         {
         }
 
-        void add(TValue value);
-        void remove(TKey key);
-        [[nodiscard]] bool exists(TKey key) const;
-
-        [[nodiscard]] auto create_prefix_view() const { return views::prefix_view<TValue, TKey>(this); }
-        [[nodiscard]] auto create_infix_view() const { return views::infix_view<TValue, TKey>(this); }
-        [[nodiscard]] auto create_postfix_view() const { return views::postfix_view<TValue, TKey>(this); };
-
-    private:
-        std::unique_ptr<binary_node<TValue, TKey>> root_;
-        std::function<TKey(TValue)> hash_;
+        void add(TValue value) { binary_tree_base.add(value); }
+        void remove(TKey key) { binary_tree_base.remove(key); }
+        [[nodiscard]] bool exists(TKey key) const { return binary_tree_base.exists(key); }
     };
-}
-
-template <typename TValue, typename TKey>
-void containers::binary_tree<TValue, TKey>::remove(TKey key)
-{
-    if (auto root = root_.get())
-    {
-        root->remove(value);
-    }
-}
-
-template <typename TValue, typename TKey>
-bool containers::binary_tree<TValue, TKey>::exists(TKey key) const
-{
-    if (const auto root = root_.get())
-    {
-        return root->exists(value);
-    }
-    return false;
-}
-
-template <typename TValue, typename TKey>
-void containers::binary_tree<TValue, TKey>::add(TValue value)
-{
-    if (auto root = root_.get())
-    {
-        root->add(value);
-    }
-    else
-    {
-        root_ = std::make_unique<binary_node<TValue, TKey>>(value, hash_);
-    }
 }

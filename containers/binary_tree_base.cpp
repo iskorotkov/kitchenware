@@ -1,7 +1,8 @@
 #include "binary_tree_base.h"
 
-containers::binary_tree_base::binary_tree_base(std::function<key_ptr(const value_ptr&)> comparer) :
-    hash_(comparer)
+containers::binary_tree_base::binary_tree_base(std::function<key_ptr(const value_ptr&)> comparer, deleter_t deleter) :
+    hash_(comparer),
+    deleter_(deleter)
 {
 }
 

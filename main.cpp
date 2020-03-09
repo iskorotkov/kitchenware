@@ -14,22 +14,22 @@ int main()
     tree.add(11);
     tree.add(10);
 
-    for (auto it : tree.create_prefix_view())
-    {
-        std::cout << it << " ";
-    }
+    //for (auto it : tree.create_prefix_view())
+    //{
+    //    std::cout << it << " ";
+    //}
 
-    std::cout << "\n";
+    //std::cout << "\n";
 
-    for (auto it : tree.create_postfix_view())
-    {
-        std::cout << it << " ";
-    }
+    //for (auto it : tree.create_postfix_view())
+    //{
+    //    std::cout << it << " ";
+    //}
 
-    std::cout << "\n";
+    //std::cout << "\n";
 
-    for (auto it : tree.create_infix_view())
-    {
-        std::cout << it << " ";
-    }
+    //for (auto it : tree.create_infix_view())
+    //{
+    //    std::cout << it << " ";
+    //}
 }
