@@ -28,4 +28,8 @@ add_executable(kitchenware
         containers/views/prefix_view.h
         containers/views/postfix_view.h
         containers/views/infix_view.h
-        main.cpp)
+        main.cpp
+        containers/binary_tree_base.cpp
+        containers/binary_tree_base.h
+        containers/binary_node_base.cpp
+        containers/binary_node_base.h)
