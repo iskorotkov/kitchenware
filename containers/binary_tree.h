@@ -34,7 +34,7 @@ namespace containers
 
     private:
         std::unique_ptr<binary_node<TValue, TKey>> root_;
-        std::function<TKey(TValue)> hash_;
+        std::function<TKey(const TValue&)> hash_;
     };
 }
 

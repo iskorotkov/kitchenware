@@ -23,28 +23,25 @@ namespace containers
         friend class containers::views::infix_view<TValue, TKey>;
 
     public:
-        binary_node(TValue value, std::function<TKey(TValue)> comparer)
-                : value_(value), hash_(comparer)
+        binary_node(TValue& value, std::function<TKey(TValue)> comparer)
+                : value_(std::make_unique<TValue>(value)), hash_(comparer)
         {
         }
 
-        void value(TValue v) { value_ = v; }
-
-        TValue& value() { return value_; }
-
+        TValue& value() { return *value_; }
 
         void add(TValue v);
         void remove(TKey key);
 
-        [[nodiscard]] TKey key() { return hash_(value_); }
+        [[nodiscard]] TKey key() { return hash_(*value_); }
 
-        [[nodiscard]] const TValue& value() const { return value_; }
+        [[nodiscard]] const TValue& value() const { return *value_; }
 
         [[nodiscard]] bool exists(TKey k) const;
 
     private:
-        TValue value_;
-        std::function<TKey(TValue)> hash_;
+        std::unique_ptr<TValue> value_;
+        std::function<TKey(const TValue&)> hash_;
         std::unique_ptr<binary_node<TValue, TKey>> left_;
         std::unique_ptr<binary_node<TValue, TKey>> right_;
 
@@ -102,7 +99,7 @@ void containers::binary_node<TValue, TKey>::remove(TKey k)
     }
     else if (k > key())
     {
-        right_remove(v);
+        right_remove(k);
     }
     else // v == value_
     {
@@ -134,13 +131,13 @@ bool containers::binary_node<TValue, TKey>::exists(TKey k) const
 template <typename TValue, typename TKey>
 bool containers::binary_node<TValue, TKey>::left_contains(TKey k) const
 {
-    return key() < value_ && left_ && left_->exists(k);
+    return key() < *value_ && left_ && left_->exists(k);
 }
 
 template <typename TValue, typename TKey>
 bool containers::binary_node<TValue, TKey>::right_contains(TKey k) const
 {
-    return key() > value_ && right_ && right_->exists(k);
+    return key() > *value_ && right_ && right_->exists(k);
 }
 
 template <typename TValue, typename TKey>
