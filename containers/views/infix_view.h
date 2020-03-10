@@ -1,5 +1,8 @@
 #pragma once
 #include <stack>
+#include "declarations.h"
+#include "binary_tree.h"
+#include "binary_node.h"
 
 namespace containers::views
 {
