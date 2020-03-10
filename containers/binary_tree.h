@@ -1,10 +1,11 @@
 #pragma once
 #include <memory>
 #include <functional>
+#include "declarations.h"
 #include "binary_node.h"
-#include "prefix_view.h"
-#include "postfix_view.h"
 #include "infix_view.h"
+#include "postfix_view.h"
+#include "prefix_view.h"
 
 namespace containers
 {

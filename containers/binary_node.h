@@ -1,5 +1,9 @@
 #pragma once
 #include <functional>
+#include "declarations.h"
+#include "infix_view.h"
+#include "postfix_view.h"
+#include "prefix_view.h"
 
 namespace containers::views
 {
