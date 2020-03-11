@@ -13,6 +13,8 @@ namespace kitchen
         void volume(volume_t v);
         [[nodiscard]] volume_t volume() const;
 
+        void print(std::ostream& out) const override;
+
         ~saucepan() override = default;
 
     private:

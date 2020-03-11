@@ -1,5 +1,9 @@
 #include <iostream>
 #include "binary_tree.h"
+#include <slow_cooker.h>
+
+using namespace containers;
+using namespace kitchen;
 
 int main()
 {
@@ -13,6 +17,9 @@ int main()
     tree.add(9);
     tree.add(11);
     tree.add(10);
+
+    slow_cooker c;
+    c.print(std::cout);
 
     for (auto it : tree.create_prefix_view())
     {

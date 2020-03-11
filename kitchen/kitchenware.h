@@ -1,4 +1,5 @@
 #pragma once
+#include <ostream>
 
 namespace kitchen
 {
@@ -9,6 +10,8 @@ namespace kitchen
 
         void number(id_t n);
         [[nodiscard]] id_t number() const;
+
+        virtual void print(std::ostream& out) const;
 
         virtual ~kitchenware() = default;
 

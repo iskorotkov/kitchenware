@@ -12,6 +12,8 @@ namespace kitchen
         void is_pressure_cooker(bool b);
         [[nodiscard]] bool is_pressure_cooker() const;
 
+        void print(std::ostream& out) const;
+
     private:
         bool is_pressure_cooker_ = false;
     };
