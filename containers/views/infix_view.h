@@ -18,29 +18,20 @@ namespace containers::views
             {
                 if (!end)
                 {
-                    first();
+                    subtree_first(tree_->root_.get());
                 }
             }
 
-            auto& operator++(); // prefix
+            auto& operator++();   // prefix
             auto operator++(int); // postfix
 
             // TODO: add decrement operators
 
-            TValue& operator*() { return value(); }
-
             const TValue& operator*() const { return value(); }
-
-            TValue& value();
-
-            // TODO: add other comparison operators
-            [[nodiscard]] bool operator<(const iterator& other) const;
 
             [[nodiscard]] bool operator==(const iterator& other) const;
 
             [[nodiscard]] bool operator!=(const iterator& other) const;
-
-            [[nodiscard]] int level() const { return stack_.size(); }
 
             [[nodiscard]] TKey key() const;
 
@@ -48,13 +39,13 @@ namespace containers::views
 
         private:
             const containers::binary_tree<TValue, TKey>* tree_;
-            std::stack<containers::binary_node<TValue, TKey>*> stack_;
+            const binary_node<TValue, TKey>* node_ = nullptr;
 
-            void first();
+            void subtree_first(const binary_node<TValue, TKey>* node);
 
-            [[nodiscard]] bool has_value() const { return !stack_.empty(); }
+            [[nodiscard]] bool has_value() const { return node_ != nullptr; }
 
-            void check_stack_has_values() const;
+            void check_has_values() const;
             void check_has_same_tree(const iterator& other) const;
         };
 
@@ -62,7 +53,7 @@ namespace containers::views
         {
         }
 
-        auto begin() { return iterator(tree_); }
+        auto begin() { return iterator(tree_, false); }
 
         auto end() { return iterator(tree_, true); }
 
@@ -73,106 +64,77 @@ namespace containers::views
     template <typename TValue, typename TKey>
     auto& infix_view<TValue, TKey>::iterator::operator++()
     {
-        check_stack_has_values();
+        check_has_values();
 
-        // Can move to the right
-        if (auto node = stack_.top()->right_.get())
+        if (node_->right())
         {
-            // Add every value in left subtrees and descend to the left-most node
-            while (node)
+            node_ = node_->right();
+            subtree_first(node_);
+        }
+        else if (node_->parent_ && node_->parent_->right() == node_)
+        {
+            auto prev = node_;
+            node_ = node_->parent_;
+            while (node_ && node_->right() == prev)
             {
-                stack_.push(node);
-                node = node->left_.get();
+                prev = node_;
+                node_ = node_->parent_;
             }
         }
-        else
+        else if (node_->parent_ && node_->parent_->left() == node_)
         {
-            // Get current node
-            auto prev = stack_.top();
-            stack_.pop();
-            decltype(prev) cur = nullptr;
-
-            if (!stack_.empty())
-            {
-                cur = stack_.top();
-            }
-
-            // Ascend to uppermost node (if exists)
-            while (!stack_.empty() && cur->right_ && cur->right_.get() == prev)
-            {
-                prev = cur;
-                stack_.pop();
-
-                // Get parent node if exists
-                if (!stack_.empty())
-                {
-                    cur = stack_.top();
-                }
-            }
+            node_ = node_->parent_;
         }
+
         return *this;
     }
 
     template <typename TValue, typename TKey>
     auto infix_view<TValue, TKey>::iterator::operator++(int)
     {
-        // TODO operator++ for iterator
+        auto copy = *this;
+        operator++();
+        return copy;
     }
 
     template <typename TValue, typename TKey>
-    void infix_view<TValue, TKey>::iterator::first()
+    void infix_view<TValue, TKey>::iterator::subtree_first(const binary_node<TValue, TKey>* node)
     {
-        auto node = tree_->root_.get();
-        while (node)
+        node_ = node;
+        while (node_->left_)
         {
-            stack_.push(node);
-            node = node->left_.get();
+            node_ = node_->left();
         }
     }
 
-    template<typename TValue, typename TKey>
+    template <typename TValue, typename TKey>
     TKey infix_view<TValue, TKey>::iterator::key() const
     {
-        check_stack_has_values();
-        return stack_.top()->key();
+        check_has_values();
+        return node_->key();
     }
 
     template <typename TValue, typename TKey>
     const TValue& infix_view<TValue, TKey>::iterator::value() const
     {
-        check_stack_has_values();
-        return stack_.top()->value();
+        check_has_values();
+        return node_->value();
     }
 
     template <typename TValue, typename TKey>
-    void infix_view<TValue, TKey>::iterator::check_stack_has_values() const
+    void infix_view<TValue, TKey>::iterator::check_has_values() const
     {
-        if (stack_.empty())
+        if (node_ == nullptr)
         {
-            // TODO: stack is empty
             throw std::range_error("Incrementing iterator past the end");
         }
     }
 
     template <typename TValue, typename TKey>
-    TValue& infix_view<TValue, TKey>::iterator::value()
-    {
-        check_stack_has_values();
-        return stack_.top()->value();
-    }
-
-    template <typename TValue, typename TKey>
-    bool infix_view<TValue, TKey>::iterator::operator<(const infix_view::iterator& other) const
-    {
-        return has_value()
-            && (!other.has_value() || this->key() < other.key());
-    }
-
-    template <typename TValue, typename TKey>
     inline bool infix_view<TValue, TKey>::iterator::operator==(const infix_view::iterator& other) const
     {
-        return (has_value() && other.has_value() && this->key() == other.key())
-            || (!has_value() && !other.has_value());
+        return (has_value() && other.has_value() && key() == other.key())
+        || (!has_value() && !other.has_value());
     }
 
     template <typename TValue, typename TKey>
