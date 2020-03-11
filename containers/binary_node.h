@@ -5,18 +5,6 @@
 #include "postfix_view.h"
 #include "prefix_view.h"
 
-namespace containers::views
-{
-    template <typename TValue, typename TKey>
-    class prefix_view;
-
-    template <typename TValue, typename TKey>
-    class postfix_view;
-
-    template <typename TValue, typename TKey>
-    class infix_view;
-}
-
 namespace containers
 {
     template <typename TValue, typename TKey>
