@@ -4,6 +4,7 @@
 #include "infix_view.h"
 #include "postfix_view.h"
 #include "prefix_view.h"
+#include "red_black.h"
 
 namespace containers
 {
@@ -14,9 +15,15 @@ namespace containers
         friend class containers::views::postfix_view<TValue, TKey>;
         friend class containers::views::infix_view<TValue, TKey>;
 
+        friend class containers::balancing::red_black<TValue, TKey>;
+
     public:
-        binary_node(TValue& value, std::function<TKey(const TValue&)> hash)
-                : value_(std::move(value)), hash_(hash)
+        binary_node(TValue& value,
+            binary_node<TValue, TKey>* parent,
+            std::function<TKey(const TValue&)> hash)
+                : value_(std::move(value)),
+                  parent_(parent),
+                  hash_(hash)
         {
         }
 
@@ -24,6 +31,9 @@ namespace containers
 
         void add(TValue v);
         void remove(TKey key);
+
+        [[nodiscard]] binary_node<TValue, TKey>* left() const { return left_.get(); }
+        [[nodiscard]] binary_node<TValue, TKey>* right() const { return right_.get(); }
 
         [[nodiscard]] TKey key() const { return hash_(value_); }
 
@@ -36,6 +46,10 @@ namespace containers
         std::function<TKey(const TValue&)> hash_;
         std::unique_ptr<binary_node<TValue, TKey>> left_;
         std::unique_ptr<binary_node<TValue, TKey>> right_;
+
+        bool is_black_ = true;
+        binary_node<TValue, TKey>* parent_;
+        balancing::red_black<TValue, TKey> balancer_;
 
         [[nodiscard]] bool left_contains(TKey k) const;
         [[nodiscard]] bool right_contains(TKey k) const;
@@ -66,7 +80,7 @@ void containers::binary_node<TValue, TKey>::add(TValue v)
         }
         else
         {
-            left_ = std::make_unique<binary_node<TValue, TKey>>(v, hash_);
+            left_ = std::make_unique<binary_node<TValue, TKey>>(v, this, hash_);
         }
     }
     else if (k > key())
@@ -77,9 +91,10 @@ void containers::binary_node<TValue, TKey>::add(TValue v)
         }
         else
         {
-            right_ = std::make_unique<binary_node<TValue, TKey>>(v, hash_);
+            right_ = std::make_unique<binary_node<TValue, TKey>>(v, this, hash_);
         }
     }
+    balancer_.insert_case1(this);
 }
 
 template <typename TValue, typename TKey>

@@ -9,6 +9,7 @@ set(CMAKE_CXX_COMPILER "C:/Users/korot/scoop/apps/llvm/9.0.0/bin/clang++.exe")
 include_directories(containers)
 include_directories(kitchen)
 include_directories(containers/views)
+include_directories(containers/balancing)
 
 add_executable(kitchenware
         containers/binary_tree.h
@@ -30,4 +31,5 @@ add_executable(kitchenware
         containers/views/infix_view.h
         containers/declarations.h
         containers/poly_tree.h
+        containers/balancing/red_black.h
         main.cpp)

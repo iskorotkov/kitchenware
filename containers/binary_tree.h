@@ -67,6 +67,6 @@ void containers::binary_tree<TValue, TKey>::add(TValue value)
     }
     else
     {
-        root_ = std::make_unique<binary_node<TValue, TKey>>(value, hash_);
+        root_ = std::make_unique<binary_node<TValue, TKey>>(value, nullptr, hash_);
     }
 }

@@ -7,7 +7,7 @@ using namespace kitchen;
 
 int main()
 {
-    //containers::poly_tree<kitchenware, int> tree([](auto& k)
+    //poly_tree<kitchenware, int> tree([](auto& k)
     //    {
     //        return k.number();
     //    });
@@ -17,14 +17,14 @@ int main()
     tree.add(200);
     tree.add(60);
 
-    auto c = new slow_cooker();
-    c->power(1);
-    c->color({ 1,2,3 });
-    c->print(std::cout);
+    //auto c = new slow_cooker();
+    //c->power(1);
+    //c->color({ 1,2,3 });
+    //c->print(std::cout);
     //tree.add(c);
 
-    auto b = tree.create_prefix_view().begin();
-    std::cout << b.level() << std::endl;
+    //auto b = tree.create_prefix_view().begin();
+    //std::cout << b.level() << std::endl;
 
     for (const auto& it : tree.create_prefix_view())
     {
