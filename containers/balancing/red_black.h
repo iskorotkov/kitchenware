@@ -21,7 +21,7 @@ namespace containers::balancing
         node_t* uncle(node_t* n)
         {
             auto g = grandparent(n);
-            if (!g) { return nullptr; }
+            if (g == nullptr) { return nullptr; }
             if (n->parent_ == g->left())
             {
                 return g->right();
@@ -50,11 +50,11 @@ namespace containers::balancing
                 }
             }
 
-            n->right_.reset(pivot->left_.release());
             if (pivot->left())
             {
                 pivot->left()->parent_ = n;
             }
+            n->right_ = std::move(pivot->left_);
             n->parent_ = pivot;
             pivot->left_.reset(n);
         }
@@ -77,11 +77,11 @@ namespace containers::balancing
                 }
             }
 
-            n->left_.reset(pivot->right_.release());
             if (pivot->right())
             {
                 pivot->right()->parent_ = n;
             }
+            n->left_ = std::move(pivot->right_);
             n->parent_ = pivot;
             pivot->right_.reset(n);
         }
