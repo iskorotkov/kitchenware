@@ -1,42 +1,40 @@
 #include <iostream>
 #include "binary_tree.h"
-#include <slow_cooker.h>
+#include "slow_cooker.h"
 
 using namespace containers;
 using namespace kitchen;
 
 int main()
 {
-    containers::binary_tree<int, int> tree;
-    tree.add(5);
-    tree.add(4);
-    tree.add(1);
-    tree.add(6);
-    tree.add(8);
-    tree.add(7);
-    tree.add(9);
-    tree.add(11);
-    tree.add(10);
+    containers::binary_tree<kitchenware, int> tree([](auto& k)
+        {
+            return k.number();
+        });
 
     slow_cooker c;
+    c.power(1);
+    c.color({ 1,2,3 });
     c.print(std::cout);
+    //tree.add(c);
 
-    for (auto it : tree.create_prefix_view())
+    for (const auto& it : tree.create_prefix_view())
     {
-        std::cout << it << " ";
+        it.print(std::cout);
+        //std::cout << it << " ";
     }
 
     std::cout << "\n";
 
-    for (auto it : tree.create_postfix_view())
+    for (const auto& it : tree.create_postfix_view())
     {
-        std::cout << it << " ";
+        //std::cout << it << " ";
     }
 
     std::cout << "\n";
 
-    for (auto it : tree.create_infix_view())
+    for (const auto& it : tree.create_infix_view())
     {
-        std::cout << it << " ";
+        //std::cout << it << " ";
     }
 }

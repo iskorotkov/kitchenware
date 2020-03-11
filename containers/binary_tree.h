@@ -21,7 +21,7 @@ namespace containers
         {
         }
 
-        explicit binary_tree(std::function<TKey(TValue)> comparer) : hash_(comparer)
+        explicit binary_tree(std::function<TKey(const TValue&)> hash) : hash_(hash)
         {
         }
 

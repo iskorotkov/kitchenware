@@ -42,6 +42,8 @@ namespace containers::views
 
             [[nodiscard]] int level() const { return stack_.size(); }
 
+            [[nodiscard]] TKey key() const;
+
             [[nodiscard]] const TValue& value() const;
 
         private:
@@ -135,6 +137,13 @@ namespace containers::views
         }
     }
 
+    template<typename TValue, typename TKey>
+    TKey postfix_view<TValue, TKey>::iterator::key() const
+    {
+        check_stack_has_values();
+        return stack_.top()->key();
+    }
+
     template <typename TValue, typename TKey>
     const TValue& postfix_view<TValue, TKey>::iterator::value() const
     {
@@ -163,13 +172,13 @@ namespace containers::views
     bool postfix_view<TValue, TKey>::iterator::operator<(const postfix_view::iterator& other) const
     {
         return has_value()
-        && (!other.has_value() || this->value() < other.value());
+        && (!other.has_value() || this->key() < other.key());
     }
 
     template <typename TValue, typename TKey>
     inline bool postfix_view<TValue, TKey>::iterator::operator==(const postfix_view::iterator& other) const
     {
-        return (has_value() && other.has_value() && this->value() == other.value())
+        return (has_value() && other.has_value() && this->key() == other.key())
         || (!has_value() && !other.has_value());
     }
 

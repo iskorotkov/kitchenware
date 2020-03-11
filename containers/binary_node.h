@@ -15,8 +15,8 @@ namespace containers
         friend class containers::views::infix_view<TValue, TKey>;
 
     public:
-        binary_node(TValue& value, std::function<TKey(TValue)> comparer)
-                : value_(std::make_unique<TValue>(value)), hash_(comparer)
+        binary_node(TValue& value, std::function<TKey(const TValue&)> hash)
+                : value_(std::make_unique<TValue>(value)), hash_(hash)
         {
         }
 
