@@ -63,7 +63,7 @@ void containers::binary_tree<TValue, TKey>::add(TValue value)
 {
     if (auto root = root_.get())
     {
-        root->add(value);
+        root->add(std::move(value));
     }
     else
     {

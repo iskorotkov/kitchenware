@@ -16,23 +16,23 @@ namespace containers
 
     public:
         binary_node(TValue& value, std::function<TKey(const TValue&)> hash)
-                : value_(std::make_unique<TValue>(value)), hash_(hash)
+                : value_(std::move(value)), hash_(hash)
         {
         }
 
-        TValue& value() { return *value_; }
+        TValue& value() { return value_; }
 
         void add(TValue v);
         void remove(TKey key);
 
-        [[nodiscard]] TKey key() const { return hash_(*value_); }
+        [[nodiscard]] TKey key() const { return hash_(value_); }
 
-        [[nodiscard]] const TValue& value() const { return *value_; }
+        [[nodiscard]] const TValue& value() const { return value_; }
 
         [[nodiscard]] bool exists(TKey k) const;
 
     private:
-        std::unique_ptr<TValue> value_;
+        TValue value_;
         std::function<TKey(const TValue&)> hash_;
         std::unique_ptr<binary_node<TValue, TKey>> left_;
         std::unique_ptr<binary_node<TValue, TKey>> right_;
@@ -62,7 +62,7 @@ void containers::binary_node<TValue, TKey>::add(TValue v)
     {
         if (left_)
         {
-            left_->add(v);
+            left_->add(std::move(v));
         }
         else
         {
@@ -73,7 +73,7 @@ void containers::binary_node<TValue, TKey>::add(TValue v)
     {
         if (right_)
         {
-            right_->add(v);
+            right_->add(std::move(v));
         }
         else
         {
@@ -123,13 +123,13 @@ bool containers::binary_node<TValue, TKey>::exists(TKey k) const
 template <typename TValue, typename TKey>
 bool containers::binary_node<TValue, TKey>::left_contains(TKey k) const
 {
-    return key() < *value_ && left_ && left_->exists(k);
+    return k < key() && left_ && left_->exists(k);
 }
 
 template <typename TValue, typename TKey>
 bool containers::binary_node<TValue, TKey>::right_contains(TKey k) const
 {
-    return key() > *value_ && right_ && right_->exists(k);
+    return k > key() && right_ && right_->exists(k);
 }
 
 template <typename TValue, typename TKey>

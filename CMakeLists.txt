@@ -29,4 +29,5 @@ add_executable(kitchenware
         containers/views/postfix_view.h
         containers/views/infix_view.h
         containers/declarations.h
+        containers/poly_tree.h
         main.cpp)
