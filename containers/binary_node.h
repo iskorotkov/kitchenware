@@ -53,18 +53,6 @@ namespace containers
 
         [[nodiscard]] bool left_contains(TKey k) const;
         [[nodiscard]] bool right_contains(TKey k) const;
-
-        [[nodiscard]] bool has_children() const { return left_ || right_; }
-
-        [[nodiscard]] bool has_both_children() const { return left_ && right_; }
-
-        [[nodiscard]] bool has_left_child() const { return left_; }
-
-        [[nodiscard]] bool has_right_child() const { return right_; }
-
-        void left_remove(TKey k);
-        void right_remove(TKey k);
-        void remove_node();
     };
 }
 
@@ -102,29 +90,28 @@ void containers::binary_node<TValue, TKey>::remove(TKey k)
 {
     if (k < key())
     {
-        left_remove(k);
+        if (!left()) { return; }
+        if (left()->key() == k)
+        {
+            auto ptr = std::unique_ptr<binary_node<TValue, TKey>>(left());
+            balancer_.delete_one_child(left());
+        }
+        else
+        {
+            left()->remove(k);
+        }
     }
     else if (k > key())
     {
-        right_remove(k);
-    }
-    else // v == value_
-    {
-        remove_node();
-    }
-}
-
-template <typename TValue, typename TKey>
-void containers::binary_node<TValue, TKey>::left_remove(TKey k)
-{
-    if (this->left_)
-    {
-        if (this->left_->value_ == k)
+        if (!left_) { return; }
+        if (right()->key() == k)
         {
-            if (!this->left_->has_children())
-            {
-                this->left_.reset();
-            }
+            auto ptr = std::unique_ptr<binary_node<TValue, TKey>>(right());
+            balancer_.delete_one_child(right());
+        }
+        else
+        {
+            right()->remove(k);
         }
     }
 }
@@ -145,14 +132,4 @@ template <typename TValue, typename TKey>
 bool containers::binary_node<TValue, TKey>::right_contains(TKey k) const
 {
     return k > key() && right_ && right_->exists(k);
-}
-
-template <typename TValue, typename TKey>
-void containers::binary_node<TValue, TKey>::right_remove(TKey k)
-{
-}
-
-template <typename TValue, typename TKey>
-void containers::binary_node<TValue, TKey>::remove_node()
-{
 }
