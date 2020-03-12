@@ -11,6 +11,17 @@ namespace containers::balancing
     public:
         using node_t = containers::binary_node<TValue, TKey>;
 
+        bool is_black(node_t* n)
+        {
+            return n == nullptr || n->is_black_;
+        }
+
+        bool is_red(node_t* n)
+        {
+            // n != nullptr && !n->is_black_
+            return !is_black(n);
+        }
+
         node_t* grandparent(node_t* n)
         {
             return n && n->parent_
@@ -100,7 +111,7 @@ namespace containers::balancing
 
         void insert_case2(node_t* n)
         {
-            if (!n->parent_->is_black_)
+            if (is_red(n->parent_))
             {
                 insert_case3(n);
             }
@@ -109,7 +120,7 @@ namespace containers::balancing
         void insert_case3(node_t* n)
         {
             auto u = uncle(n);
-            if (u && !u->is_black_)
+            if (is_red(u))
             {
                 n->parent_->is_black_ = true;
                 n->is_black_ = true;
@@ -195,6 +206,10 @@ namespace containers::balancing
 
         void delete_one_child(node_t* n)
         {
+            if (n == nullptr)
+            {
+                return;
+            }
             node_t* child = is_leaf(n) ? n->left() : n->right();
             replace_node(n, child);
             if (n->is_black_ && child)
@@ -221,7 +236,7 @@ namespace containers::balancing
         void delete_case2(node_t* n)
         {
             auto s = sibling(n);
-            if (!s->is_black_)
+            if (!is_black(s))
             {
                 n->parent_->is_black_ = false;
                 s->is_black_ = true;
@@ -240,10 +255,10 @@ namespace containers::balancing
         void delete_case3(node_t* n)
         {
             auto s = sibling(n);
-            if (n->parent_->is_black_
-                && s->is_black_
-                && s->left()->is_black_
-                && s->right()->is_black_)
+            if (is_black(n->parent_)
+                && is_black(s)
+                && is_black(s->left())
+                && is_black(s->right()))
             {
                 s->is_black_ = false;
                 delete_case1(n->parent_);
@@ -257,10 +272,10 @@ namespace containers::balancing
         void delete_case4(node_t* n)
         {
             auto s = sibling(n);
-            if (!n->parent_->is_black_
-                && s->is_black_
-                && s->left()->is_black_
-                && s->right()->is_black_)
+            if (is_red(n->parent_)
+                && is_black(s)
+                && is_black(s->left())
+                && is_black(s->right()))
             {
                 s->is_black_ = false;
                 n->parent_->is_black_ = true;
@@ -274,19 +289,19 @@ namespace containers::balancing
         void delete_case5(node_t* n)
         {
             auto s = sibling(n);
-            if (s->is_black_)
+            if (is_black(s))
             {
                 if (n == n->parent_->left()
-                    && s->right()->is_black_
-                    && !s->left()->is_black_)
+                    && is_black(s->right())
+                    && is_red(s->left()))
                 {
                     s->is_black_ = false;
                     s->left()->is_black_ = true;
                     rotate_right(s);
                 }
                 else if (n == n->parent_->right()
-                    && s->left()->is_black_
-                    && !s->right()->is_black_)
+                    && is_black(s->left())
+                    && is_red(s->right()))
                 {
                     s->is_black_ = false;
                     s->right()->is_black_ = true;
@@ -299,7 +314,7 @@ namespace containers::balancing
         void delete_case6(node_t* n)
         {
             auto s = sibling(n);
-            s->is_black_ = n->parent_->is_black_;
+            s->is_black_ = is_black(n->parent_);
             n->parent_->is_black_ = true;
             if (n == n->parent_->left())
             {

@@ -21,7 +21,9 @@ int main()
     tree.add(-5);
     tree.add(-4);
 
+    //tree.remove(-4);
     tree.remove(-4);
+    //tree.remove(300);
 
     //auto c = new slow_cooker();
     //c->power(1);
@@ -32,20 +34,20 @@ int main()
     //auto b = tree.create_prefix_view().begin();
     //std::cout << b.level() << std::endl;
 
-    for (const auto& it : tree.create_prefix_view())
-    {
-        //it->print(std::cout);
-        std::cout << it << " ";
-    }
+    //for (const auto& it : tree.create_prefix_view())
+    //{
+    //    //it->print(std::cout);
+    //    std::cout << it << " ";
+    //}
 
-    std::cout << "\n";
+    //std::cout << "\n";
 
-    for (const auto& it : tree.create_postfix_view())
-    {
-        std::cout << it << " ";
-    }
+    //for (const auto& it : tree.create_postfix_view())
+    //{
+    //    std::cout << it << " ";
+    //}
 
-    std::cout << "\n";
+    //std::cout << "\n";
 
     for (const auto& it : tree.create_infix_view())
     {

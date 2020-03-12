@@ -69,6 +69,7 @@ void containers::binary_node<TValue, TKey>::add(TValue v)
         else
         {
             left_ = std::make_unique<binary_node<TValue, TKey>>(v, this, hash_);
+            balancer_.insert_case1(left());
         }
     }
     else if (k > key())
@@ -80,9 +81,9 @@ void containers::binary_node<TValue, TKey>::add(TValue v)
         else
         {
             right_ = std::make_unique<binary_node<TValue, TKey>>(v, this, hash_);
+            balancer_.insert_case1(right());
         }
     }
-    balancer_.insert_case1(this);
 }
 
 template <typename TValue, typename TKey>
