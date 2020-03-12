@@ -206,21 +206,20 @@ namespace containers::balancing
 
         void delete_one_child(node_t* n)
         {
-            if (n == nullptr)
-            {
-                return;
-            }
             node_t* child = is_leaf(n) ? n->left() : n->right();
             replace_node(n, child);
-            if (n->is_black_ && child)
+            if (is_black(n))
             {
-                if (!child->is_black_)
+                if (child)
                 {
-                    child->is_black_ = true;
-                }
-                else
-                {
-                    delete_case1(child);
+                    if (is_red(child))
+                    {
+                        child->is_black_ = true;
+                    }
+                    else
+                    {
+                        delete_case1(child);
+                    }
                 }
             }
         }
@@ -236,7 +235,7 @@ namespace containers::balancing
         void delete_case2(node_t* n)
         {
             auto s = sibling(n);
-            if (!is_black(s))
+            if (is_red(s))
             {
                 n->parent_->is_black_ = false;
                 s->is_black_ = true;
@@ -255,6 +254,10 @@ namespace containers::balancing
         void delete_case3(node_t* n)
         {
             auto s = sibling(n);
+            if (s == nullptr)
+            {
+                return;
+            }
             if (is_black(n->parent_)
                 && is_black(s)
                 && is_black(s->left())

@@ -96,6 +96,8 @@ void containers::binary_node<TValue, TKey>::remove(TKey k)
         {
             auto ptr = std::unique_ptr<binary_node<TValue, TKey>>(left());
             balancer_.delete_one_child(left());
+            ptr->left_.release();
+            ptr->right_.release();
         }
         else
         {
@@ -109,6 +111,8 @@ void containers::binary_node<TValue, TKey>::remove(TKey k)
         {
             auto ptr = std::unique_ptr<binary_node<TValue, TKey>>(right());
             balancer_.delete_one_child(right());
+            ptr->left_.release();
+            ptr->right_.release();
         }
         else
         {
