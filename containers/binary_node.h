@@ -103,7 +103,7 @@ void containers::binary_node<TValue, TKey>::remove(TKey k)
     }
     else if (k > key())
     {
-        if (!left_) { return; }
+        if (!right()) { return; }
         if (right()->key() == k)
         {
             auto ptr = std::unique_ptr<binary_node<TValue, TKey>>(right());

@@ -171,7 +171,10 @@ namespace containers::balancing
 
         void replace_node(node_t* n, node_t* child)
         {
-            child->parent_ = n->parent_;
+            if (child)
+            {
+                child->parent_ = n->parent_;
+            }
             if (n == n->parent_->left())
             {
                 n->parent_->left_.release();
@@ -194,7 +197,7 @@ namespace containers::balancing
         {
             node_t* child = is_leaf(n) ? n->left() : n->right();
             replace_node(n, child);
-            if (n->is_black_)
+            if (n->is_black_ && child)
             {
                 if (!child->is_black_)
                 {
