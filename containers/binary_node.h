@@ -18,7 +18,7 @@ namespace containers
         friend class containers::balancing::red_black<TValue, TKey>;
 
     public:
-        binary_node(TValue value,
+        binary_node(TValue& value,
             std::function<TKey(const TValue&)> hash)
                 : value_(std::move(value)),
                   hash_(hash)
@@ -40,7 +40,7 @@ namespace containers
         binary_node<TValue, TKey>* right_ = nullptr;
         binary_node<TValue, TKey>* parent_ = nullptr;
 
-        uint8_t tag_;
+        uint8_t tag_ = 0;
 
         [[nodiscard]] bool left_contains(TKey k) const;
         [[nodiscard]] bool right_contains(TKey k) const;

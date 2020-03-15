@@ -46,7 +46,7 @@ namespace containers
 template <typename TValue, typename TKey>
 void containers::binary_tree<TValue, TKey>::remove(TKey key)
 {
-    // TODO: remove
+    balancer_.remove(root_, key);
 }
 
 template<typename TValue, typename TKey>
@@ -72,7 +72,5 @@ bool containers::binary_tree<TValue, TKey>::exists(TKey key) const
 template <typename TValue, typename TKey>
 void containers::binary_tree<TValue, TKey>::add(TValue value)
 {
-    auto node = new binary_node<TValue, TKey>(std::move(value), hash_);
-    root_ = balancer_.insert(root_, node);
-    balancer_.fix_violation(root_, node);
+    balancer_.add(root_, value, hash_);
 }
