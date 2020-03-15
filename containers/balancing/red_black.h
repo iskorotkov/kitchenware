@@ -34,6 +34,7 @@ namespace containers::balancing
             auto node = new binary_node<TValue, TKey>(value, hash);
             if (root)
             {
+                node->tag_ = color::red;
                 node->parent_ = temp;
                 if (key < temp->key())
                 {
@@ -47,6 +48,7 @@ namespace containers::balancing
             }
             else
             {
+                node->tag_ = color::black;
                 root = node;
             }
         }
@@ -58,7 +60,7 @@ namespace containers::balancing
                 return;
             }
 
-            auto v = search(key);
+            auto v = search(root, key);
             if (v->key() == key)
             {
                 delete_node(root, v);
@@ -298,7 +300,7 @@ namespace containers::balancing
             }
             return is_on_left(n)
                 ? n->parent_->right_
-                : n->parent->left_;
+                : n->parent_->left_;
         }
 
         void move_down(node_t* n, node_t* n_parent)
@@ -320,8 +322,8 @@ namespace containers::balancing
 
         bool has_red_child(node_t* n)
         {
-            return n->left_ && n->left_->tag_ == color::red
-                || n->right_ && n->right_->tag_ == color::red;
+            return (n->left_ && n->left_->tag_ == color::red)
+                || (n->right_ && n->right_->tag_ == color::red);
         }
 
         void left_rotate(node_t*& root, node_t* n)
@@ -455,7 +457,7 @@ namespace containers::balancing
             uv_black &= (v->tag_ == color::black);
             auto parent = v->parent_;
 
-            if (u)
+            if (u == nullptr)
             {
                 if (v == root)
                 {
@@ -484,6 +486,9 @@ namespace containers::balancing
                         parent->right_ = nullptr;
                     }
                 }
+
+                v->left_ = nullptr;
+                v->right_ = nullptr;
                 delete v;
                 return;
             }
@@ -497,13 +502,15 @@ namespace containers::balancing
                     if (v->left_)
                     {
                         v->left_->parent_ = u;
-                        v->left_ == nullptr;
+                        v->left_ = nullptr;
                     }
                     if (v->right_)
                     {
                         v->right_->parent_ = u;
-                        v->right_->nullptr;
+                        v->right_ = nullptr;
                     }
+                    v->left_ = nullptr;
+                    v->right_ = nullptr;
                     delete v;
                 }
                 else
@@ -516,7 +523,11 @@ namespace containers::balancing
                     {
                         parent->right_ = u;
                     }
+
+                    v->left_ = nullptr;
+                    v->right_ = nullptr;
                     delete v;
+
                     u->parent_ = parent;
                     if (uv_black)
                     {
@@ -530,54 +541,36 @@ namespace containers::balancing
                 return;
             }
 
-            swap_nodes(u, v);
+            swap_nodes(root, u, v);
             delete_node(root, u);
         }
 
-        void swap_nodes(node_t* u, node_t* v)
+        void swap_nodes(node_t*& root, node_t* u, node_t* v)
         {
-            if (u->left_)
-            {
-                u->left_->parent_ = v;
-            }
-            if (u->right_)
-            {
-                u->right_->parent_ = v;
-            }
-            if (v->left_)
-            {
-                v->left_->parent_ = u;
-            }
-            if (v->right_)
-            {
-                v->right_->parent_ = u;
-            }
-            std::swap(u->parent_, v->parent_);
-            std::swap(u->left_, v->left_);
-            std::swap(u->right_, v->right_);
+            std::swap(u->value_, v->value_);
         }
 
-        void fix_double_black(node_t*&, node_t* x)
+        void fix_double_black(node_t*& root, node_t* x)
         {
             if (x == root)
             {
                 return;
             }
 
-            auto sibling = sibling(x);
+            auto sib = sibling(x);
             auto parent = x->parent_;
 
-            if (sibling == nullptr)
+            if (sib == nullptr)
             {
                 fix_double_black(root, parent);
             }
             else
             {
-                if (sibling->tag_ == color::red)
+                if (sib->tag_ == color::red)
                 {
                     parent->tag_ = color::red;
-                    sibling->tag_ = color::black;
-                    if (is_on_left(sibling))
+                    sib->tag_ = color::black;
+                    if (is_on_left(sib))
                     {
                         right_rotate(root, parent);
                     }
@@ -589,36 +582,36 @@ namespace containers::balancing
                 }
                 else
                 {
-                    if (has_red_child(sibling))
+                    if (has_red_child(sib))
                     {
-                        if (sibling->left_
-                            && sibling->left_->tag_ == color::red)
+                        if (sib->left_
+                            && sib->left_->tag_ == color::red)
                         {
-                            if (is_on_left(sibling))
+                            if (is_on_left(sib))
                             {
-                                sibling->left_->tag_ = sibling->tag_;
-                                sibling->tag_ = parent->tag_;
+                                sib->left_->tag_ = sib->tag_;
+                                sib->tag_ = parent->tag_;
                                 right_rotate(root, parent);
                             }
                             else
                             {
-                                sibling->left_->tag_ = parent->tag_;
-                                right_rotate(root, sibling);
-                                left_rotate(parent);
+                                sib->left_->tag_ = parent->tag_;
+                                right_rotate(root, sib);
+                                left_rotate(root, parent);
                             }
                         }
                         else
                         {
-                            if (is_on_left(sibling))
+                            if (is_on_left(sib))
                             {
-                                sibling->right_->tag_ = parent->tag_;
-                                left_rotate(root, sibling);
+                                sib->right_->tag_ = parent->tag_;
+                                left_rotate(root, sib);
                                 right_rotate(root, parent);
                             }
                             else
                             {
-                                sibling->right_->tag_ = sibling->tag_;
-                                sibling->tag_ = parent->tag_;
+                                sib->right_->tag_ = sib->tag_;
+                                sib->tag_ = parent->tag_;
                                 left_rotate(root, parent);
                             }
                         }
@@ -626,7 +619,7 @@ namespace containers::balancing
                     }
                     else
                     {
-                        sibling->tag_ = color::red;
+                        sib->tag_ = color::red;
                         if (parent->tag_ == color::black)
                         {
                             fix_double_black(root, parent);

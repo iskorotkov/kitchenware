@@ -21,9 +21,9 @@ int main()
     tree.add(-5);
     tree.add(-4);
 
-    //tree.remove(-1);
-    //tree.remove(-4);
-    //tree.remove(60);
+    tree.remove(1);
+    tree.remove(-4);
+    tree.remove(60);
 
     //auto c = new slow_cooker();
     //c->power(1);

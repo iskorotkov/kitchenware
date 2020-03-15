@@ -101,7 +101,7 @@ namespace containers::views
     void infix_view<TValue, TKey>::iterator::subtree_first(const binary_node<TValue, TKey>* node)
     {
         node_ = node;
-        while (node_->left_)
+        while (node && node_->left_)
         {
             node_ = node_->left_;
         }
