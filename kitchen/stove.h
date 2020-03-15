@@ -27,7 +27,7 @@ namespace kitchen
         void color(const color_t& c);
         [[nodiscard]] color_t color() const;
 
-        void print(std::ostream& out) const override;
+        void print(std::ostream& out, bool full_output = true) const override;
 
         ~stove() override = default;
 

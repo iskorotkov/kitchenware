@@ -10,8 +10,11 @@ kitchen::saucepan::volume_t kitchen::saucepan::volume() const
     return volume_;
 }
 
-void kitchen::saucepan::print(std::ostream& out) const
+void kitchen::saucepan::print(std::ostream& out, bool full_output) const
 {
-    kitchenware::print(out);
+    if (full_output)
+    {
+        kitchenware::print(out);
+    }
     out << "volume = " << volume() << "\n";
 }

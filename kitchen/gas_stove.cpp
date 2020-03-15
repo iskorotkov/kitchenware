@@ -10,8 +10,11 @@ kitchen::gas_stove::gas_waste_t kitchen::gas_stove::gas_waste() const
     return gas_waste_;
 }
 
-void kitchen::gas_stove::print(std::ostream& out) const
+void kitchen::gas_stove::print(std::ostream& out, bool full_output) const
 {
-    stove::print(out);
+    if (full_output)
+    {
+        stove::print(out);
+    }
     out << "gas waste = " << gas_waste() << "\n";
 }

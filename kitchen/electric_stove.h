@@ -13,7 +13,7 @@ namespace kitchen
         void power(power_t p);
         [[nodiscard]] power_t power() const;
 
-        void print(std::ostream& out) const override;
+        void print(std::ostream& out, bool full_output = true) const override;
 
         ~electric_stove() override = default;
 

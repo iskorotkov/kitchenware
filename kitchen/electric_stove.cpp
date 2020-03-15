@@ -10,8 +10,11 @@ kitchen::electric_stove::power_t kitchen::electric_stove::power() const
     return power_;
 }
 
-void kitchen::electric_stove::print(std::ostream& out) const
+void kitchen::electric_stove::print(std::ostream& out, bool full_output) const
 {
-    stove::print(out);
+    if (full_output)
+    {
+        stove::print(out);
+    }
     out << "power = " << power() << "\n";
 }

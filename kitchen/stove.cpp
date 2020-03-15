@@ -11,9 +11,12 @@ kitchen::stove::color_t kitchen::stove::color() const
     return color_;
 }
 
-void kitchen::stove::print(std::ostream& out) const
+void kitchen::stove::print(std::ostream& out, bool full_output) const
 {
-    kitchenware::print(out);
+    if (full_output)
+    {
+        kitchenware::print(out);
+    }
     out << "color = " << color().to_string() << "\n";
 }
 
