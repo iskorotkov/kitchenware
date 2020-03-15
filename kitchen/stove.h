@@ -4,7 +4,7 @@
 
 namespace kitchen
 {
-    class stove : public kitchenware
+    class stove : public virtual kitchenware
     {
     public:
         class color_t

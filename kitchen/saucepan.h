@@ -3,7 +3,7 @@
 
 namespace kitchen
 {
-    class saucepan : public kitchenware
+    class saucepan : public virtual kitchenware
     {
     public:
         using volume_t = double;
