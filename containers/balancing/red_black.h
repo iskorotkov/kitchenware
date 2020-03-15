@@ -10,17 +10,12 @@ namespace containers::balancing
     {
     public:
         using node_t = containers::binary_node<TValue, TKey>;
-
-        bool is_black(node_t* n)
+        
+        enum color : uint8_t
         {
-            return n == nullptr || n->is_black_;
-        }
-
-        bool is_red(node_t* n)
-        {
-            // n != nullptr && !n->is_black_
-            return !is_black(n);
-        }
+            black,
+            red
+        };
 
         node_t* grandparent(node_t* n)
         {
@@ -33,302 +28,178 @@ namespace containers::balancing
         {
             auto g = grandparent(n);
             if (g == nullptr) { return nullptr; }
-            if (n->parent_ == g->left())
+            if (n->parent_ == g->left_)
             {
-                return g->right();
+                return g->right_;
             }
             else
             {
-                return g->left();
+                return g->left_;
             }
         }
 
-        void rotate_left(node_t* n)
+        node_t* insert(node_t* root, node_t* pt)
         {
-            node_t* pivot = n->right_.release();
-            pivot->parent_ = n->parent_;
-            if (n->parent_)
+            if (root == nullptr)
             {
-                if (n->parent_->left() == n)
+                return pt;
+            }
+
+            if (pt->key() < root->key())
+            {
+                root->left_ = insert(root->left_, pt);
+                root->left_->parent_ = root;
+            }
+            else if (pt->key() > root->key())
+            {
+                root->right_ = insert(root->right_, pt);
+                root->right_->parent_ = root;
+            }
+
+            return root;
+        }
+
+        void rotate_left(node_t*& root, node_t*& pt)
+        {
+            auto pt_right = pt->right_;
+            pt->right_ = pt_right->left_;
+
+            if (pt->right_)
+            {
+                pt->right_->parent_ = pt;
+            }
+
+            pt_right->parent_ = pt->parent_;
+
+            if (pt->parent_ == nullptr)
+            {
+                root = pt_right;
+            }
+            else if (pt == pt->parent_->left_)
+            {
+                pt->parent_->left_ = pt_right;
+            }
+            else
+            {
+                pt->parent_->right_ = pt_right;
+            }
+
+            pt_right->left_ = pt;
+            pt->parent_ = pt_right;
+        }
+
+        void rotate_right(node_t*& root, node_t*& pt)
+        {
+            auto pt_left = pt->left_;
+            pt->left_ = pt_left->right_;
+
+            if (pt->left_)
+            {
+                pt->left_->parent_ = pt;
+            }
+
+            pt_left->parent_ = pt->parent_;
+
+            if (pt->parent_ == nullptr)
+            {
+                root = pt_left;
+            }
+            else if (pt == pt->parent_->left_)
+            {
+                pt->parent_->left_ = pt_left;
+            }
+            else
+            {
+                pt->parent_->right_ = pt_left;
+            }
+
+            pt_left->right_ = pt;
+            pt->parent_ = pt_left;
+        }
+
+        void fix_violation(node_t*& root, node_t*& pt)
+        {
+            while ((pt != root) && (pt->tag_ != color::black) &&
+                (pt->parent_->tag_ == color::red))
+            {
+                auto parent_pt = pt->parent_;
+                auto grand_parent_pt = pt->parent_->parent_;
+
+                /*  Case : A
+                    Parent of pt is left child of Grand-parent of pt */
+                if (parent_pt == grand_parent_pt->left_)
                 {
-                    n->parent_->left_.release();
-                    n->parent_->left_.reset(pivot);
-                }
-                else
-                {
-                    n->parent_->right_.release();
-                    n->parent_->right_.reset(pivot);
-                }
-            }
+                    auto uncle_pt = grand_parent_pt->right_;
 
-            if (pivot->left())
-            {
-                pivot->left()->parent_ = n;
-            }
-            n->right_ = std::move(pivot->left_);
-            n->parent_ = pivot;
-            pivot->left_.reset(n);
-        }
-
-        void rotate_right(node_t* n)
-        {
-            node_t* pivot = n->left_.release();
-            pivot->parent_ = n->parent_;
-            if (n->parent_)
-            {
-                if (n->parent_->left() == n)
-                {
-                    n->parent_->left_.release();
-                    n->parent_->left_.reset(pivot);
-                }
-                else
-                {
-                    n->parent_->right_.release();
-                    n->parent_->right_.reset(pivot);
-                }
-            }
-
-            if (pivot->right())
-            {
-                pivot->right()->parent_ = n;
-            }
-            n->left_ = std::move(pivot->right_);
-            n->parent_ = pivot;
-            pivot->right_.reset(n);
-        }
-
-        void insert_case1(node_t* n)
-        {
-            if (n->parent_ == nullptr)
-            {
-                n->is_black_ = true;
-            }
-            else
-            {
-                insert_case2(n);
-            }
-        }
-
-        void insert_case2(node_t* n)
-        {
-            if (is_red(n->parent_))
-            {
-                insert_case3(n);
-            }
-        }
-
-        void insert_case3(node_t* n)
-        {
-            auto u = uncle(n);
-            if (is_red(u))
-            {
-                n->parent_->is_black_ = true;
-                n->is_black_ = true;
-                auto g = n->parent_->parent_;
-                g->is_black_ = false;
-                insert_case1(g);
-            }
-            else
-            {
-                insert_case4(n);
-            }
-        }
-
-        void insert_case4(node_t* n)
-        {
-            auto g = grandparent(n);
-            if (n == n->parent_->right()
-                && n->parent_ == g->left())
-            {
-                rotate_left(n->parent_);
-                n = n->left();
-            }
-            else if (n == n->parent_->left()
-                && n->parent_ == g->right())
-            {
-                rotate_right(n->parent_);
-                n = n->right();
-            }
-            insert_case5(n);
-        }
-
-        void insert_case5(node_t* n)
-        {
-            auto g = grandparent(n);
-            n->parent_->is_black_ = true;
-            g->is_black_ = false;
-            if (n == n->parent_->left()
-                && n->parent_ == g->left())
-            {
-                rotate_right(g);
-            }
-            else
-            {
-                rotate_left(g);
-            }
-        }
-
-        node_t* sibling(node_t* n)
-        {
-            if (n == n->parent_->left())
-            {
-                return n->parent_->right();
-            }
-            else
-            {
-                return n->parent_->left();
-            }
-        }
-
-        void replace_node(node_t* n, node_t* child)
-        {
-            if (child)
-            {
-                child->parent_ = n->parent_;
-            }
-            if (n == n->parent_->left())
-            {
-                n->parent_->left_.release();
-                n->parent_->left_.reset(child);
-            }
-            else
-            {
-                n->parent_->right_.release();
-                n->parent_->right_.reset(child);
-            }
-        }
-
-        bool is_leaf(node_t* n)
-        {
-            return n->left() == nullptr
-                && n->right() == nullptr;
-        }
-
-        void delete_one_child(node_t* n)
-        {
-            node_t* child = is_leaf(n) ? n->left() : n->right();
-            replace_node(n, child);
-            if (is_black(n))
-            {
-                if (child)
-                {
-                    if (is_red(child))
+                    /* Case : 1
+                       The uncle of pt is also red
+                       Only Recoloring required */
+                    if (uncle_pt && uncle_pt->tag_ == color::red)
                     {
-                        child->is_black_ = true;
+                        grand_parent_pt->tag_ = color::red;
+                        parent_pt->tag_ = color::black;
+                        uncle_pt->tag_ = color::black;
+                        pt = grand_parent_pt;
                     }
                     else
                     {
-                        delete_case1(child);
+                        /* Case : 2
+                           pt is right child of its parent
+                           Left-rotation required */
+                        if (pt == parent_pt->right_)
+                        {
+                            rotate_left(root, parent_pt);
+                            pt = parent_pt;
+                            parent_pt = pt->parent_;
+                        }
+
+                        /* Case : 3
+                           pt is left child of its parent
+                           Right-rotation required */
+                        rotate_right(root, grand_parent_pt);
+                        std::swap(parent_pt->tag_, grand_parent_pt->tag_);
+                        pt = parent_pt;
+                    }
+                }
+                /* Case : B
+                   Parent of pt is right child of Grand-parent of pt */
+                else
+                {
+                    auto uncle_pt = grand_parent_pt->left_;
+
+                    /*  Case : 1
+                        The uncle of pt is also red
+                        Only Recoloring required */
+                    if (uncle_pt && uncle_pt->tag_ == color::red)
+                    {
+                        grand_parent_pt->tag_ = color::red;
+                        parent_pt->tag_ = color::black;
+                        uncle_pt->tag_ = color::black;
+                        pt = grand_parent_pt;
+                    }
+                    else
+                    {
+                        /* Case : 2
+                           pt is left child of its parent
+                           Right-rotation required */
+                        if (pt == parent_pt->left_)
+                        {
+                            rotate_right(root, parent_pt);
+                            pt = parent_pt;
+                            parent_pt = pt->parent_;
+                        }
+
+                        /* Case : 3
+                           pt is right child of its parent
+                           Left-rotation required */
+                        rotate_left(root, grand_parent_pt);
+                        std::swap(parent_pt->tag_, grand_parent_pt->tag_);
+                        pt = parent_pt;
                     }
                 }
             }
-        }
 
-        void delete_case1(node_t* n)
-        {
-            if (n->parent_)
-            {
-                delete_case2(n);
-            }
-        }
-
-        void delete_case2(node_t* n)
-        {
-            auto s = sibling(n);
-            if (is_red(s))
-            {
-                n->parent_->is_black_ = false;
-                s->is_black_ = true;
-                if (n == n->parent_->left())
-                {
-                    rotate_left(n->parent_);
-                }
-                else
-                {
-                    rotate_right(n->parent_);
-                }
-            }
-            delete_case3(n);
-        }
-
-        void delete_case3(node_t* n)
-        {
-            auto s = sibling(n);
-            if (s == nullptr)
-            {
-                return;
-            }
-            if (is_black(n->parent_)
-                && is_black(s)
-                && is_black(s->left())
-                && is_black(s->right()))
-            {
-                s->is_black_ = false;
-                delete_case1(n->parent_);
-            }
-            else
-            {
-                delete_case4(n);
-            }
-        }
-
-        void delete_case4(node_t* n)
-        {
-            auto s = sibling(n);
-            if (is_red(n->parent_)
-                && is_black(s)
-                && is_black(s->left())
-                && is_black(s->right()))
-            {
-                s->is_black_ = false;
-                n->parent_->is_black_ = true;
-            }
-            else
-            {
-                delete_case5(n);
-            }
-        }
-
-        void delete_case5(node_t* n)
-        {
-            auto s = sibling(n);
-            if (is_black(s))
-            {
-                if (n == n->parent_->left()
-                    && is_black(s->right())
-                    && is_red(s->left()))
-                {
-                    s->is_black_ = false;
-                    s->left()->is_black_ = true;
-                    rotate_right(s);
-                }
-                else if (n == n->parent_->right()
-                    && is_black(s->left())
-                    && is_red(s->right()))
-                {
-                    s->is_black_ = false;
-                    s->right()->is_black_ = true;
-                    rotate_left(s);
-                }
-            }
-            delete_case6(n);
-        }
-
-        void delete_case6(node_t* n)
-        {
-            auto s = sibling(n);
-            s->is_black_ = is_black(n->parent_);
-            n->parent_->is_black_ = true;
-            if (n == n->parent_->left())
-            {
-                s->right()->is_black_ = true;
-                rotate_left(n->parent_);
-            }
-            else
-            {
-                s->left()->is_black_ = true;
-                rotate_right(n->parent_);
-            }
+            root->tag_ = color::black;
         }
     };
 }

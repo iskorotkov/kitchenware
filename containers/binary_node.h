@@ -18,22 +18,12 @@ namespace containers
         friend class containers::balancing::red_black<TValue, TKey>;
 
     public:
-        binary_node(TValue& value,
-            binary_node<TValue, TKey>* parent,
+        binary_node(TValue value,
             std::function<TKey(const TValue&)> hash)
                 : value_(std::move(value)),
-                  parent_(parent),
                   hash_(hash)
         {
         }
-
-        TValue& value() { return value_; }
-
-        void add(TValue v);
-        void remove(TKey key);
-
-        [[nodiscard]] binary_node<TValue, TKey>* left() const { return left_.get(); }
-        [[nodiscard]] binary_node<TValue, TKey>* right() const { return right_.get(); }
 
         [[nodiscard]] TKey key() const { return hash_(value_); }
 
@@ -41,15 +31,16 @@ namespace containers
 
         [[nodiscard]] bool exists(TKey k) const;
 
+        ~binary_node();
+
     private:
         TValue value_;
         std::function<TKey(const TValue&)> hash_;
-        std::unique_ptr<binary_node<TValue, TKey>> left_;
-        std::unique_ptr<binary_node<TValue, TKey>> right_;
+        binary_node<TValue, TKey>* left_ = nullptr;
+        binary_node<TValue, TKey>* right_ = nullptr;
+        binary_node<TValue, TKey>* parent_ = nullptr;
 
-        bool is_black_ = true;
-        binary_node<TValue, TKey>* parent_;
-        balancing::red_black<TValue, TKey> balancer_;
+        uint8_t tag_;
 
         [[nodiscard]] bool left_contains(TKey k) const;
         [[nodiscard]] bool right_contains(TKey k) const;
@@ -57,74 +48,22 @@ namespace containers
 }
 
 template <typename TValue, typename TKey>
-void containers::binary_node<TValue, TKey>::add(TValue v)
-{
-    auto k = hash_(v);
-    if (k < key())
-    {
-        if (left_)
-        {
-            left_->add(std::move(v));
-        }
-        else
-        {
-            left_ = std::make_unique<binary_node<TValue, TKey>>(v, this, hash_);
-            balancer_.insert_case1(left());
-        }
-    }
-    else if (k > key())
-    {
-        if (right_)
-        {
-            right_->add(std::move(v));
-        }
-        else
-        {
-            right_ = std::make_unique<binary_node<TValue, TKey>>(v, this, hash_);
-            balancer_.insert_case1(right());
-        }
-    }
-}
-
-template <typename TValue, typename TKey>
-void containers::binary_node<TValue, TKey>::remove(TKey k)
-{
-    if (k < key())
-    {
-        if (!left()) { return; }
-        if (left()->key() == k)
-        {
-            auto ptr = std::unique_ptr<binary_node<TValue, TKey>>(left());
-            balancer_.delete_one_child(left());
-            ptr->left_.release();
-            ptr->right_.release();
-        }
-        else
-        {
-            left()->remove(k);
-        }
-    }
-    else if (k > key())
-    {
-        if (!right()) { return; }
-        if (right()->key() == k)
-        {
-            auto ptr = std::unique_ptr<binary_node<TValue, TKey>>(right());
-            balancer_.delete_one_child(right());
-            ptr->left_.release();
-            ptr->right_.release();
-        }
-        else
-        {
-            right()->remove(k);
-        }
-    }
-}
-
-template <typename TValue, typename TKey>
 bool containers::binary_node<TValue, TKey>::exists(TKey k) const
 {
     return key() == k || left_contains(k) || right_contains(k);
+}
+
+template<typename TValue, typename TKey>
+containers::binary_node<TValue, TKey>::~binary_node()
+{
+    if (left_)
+    {
+        delete left_;
+    }
+    if (right_)
+    {
+        delete right_;
+    }
 }
 
 template <typename TValue, typename TKey>

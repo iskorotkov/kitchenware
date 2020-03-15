@@ -18,7 +18,7 @@ namespace containers::views
             {
                 if (!end)
                 {
-                    subtree_first(tree_->root_.get());
+                    subtree_first(tree_->root_);
                 }
             }
 
@@ -66,22 +66,22 @@ namespace containers::views
     {
         check_has_values();
 
-        if (node_->right())
+        if (node_->right_)
         {
-            node_ = node_->right();
+            node_ = node_->right_;
             subtree_first(node_);
         }
-        else if (node_->parent_ && node_->parent_->right() == node_)
+        else if (node_->parent_ && node_->parent_->right_ == node_)
         {
             auto prev = node_;
             node_ = node_->parent_;
-            while (node_ && node_->right() == prev)
+            while (node_ && node_->right_ == prev)
             {
                 prev = node_;
                 node_ = node_->parent_;
             }
         }
-        else if (node_->parent_ && node_->parent_->left() == node_)
+        else if (node_->parent_ && node_->parent_->left_ == node_)
         {
             node_ = node_->parent_;
         }
@@ -103,7 +103,7 @@ namespace containers::views
         node_ = node;
         while (node_->left_)
         {
-            node_ = node_->left();
+            node_ = node_->left_;
         }
     }
 

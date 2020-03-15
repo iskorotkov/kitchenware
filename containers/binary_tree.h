@@ -27,25 +27,35 @@ namespace containers
 
         void add(TValue value);
         void remove(TKey key);
-        void clear() { root_.reset(); }
+        void clear();
         [[nodiscard]] bool exists(TKey key) const;
 
         [[nodiscard]] auto create_prefix_view() const { return views::prefix_view<TValue, TKey>(this); }
         [[nodiscard]] auto create_infix_view() const { return views::infix_view<TValue, TKey>(this); }
         [[nodiscard]] auto create_postfix_view() const { return views::postfix_view<TValue, TKey>(this); };
 
+        ~binary_tree() { clear(); }
+
     private:
-        std::unique_ptr<binary_node<TValue, TKey>> root_;
+        binary_node<TValue, TKey>* root_ = nullptr;
         std::function<TKey(const TValue&)> hash_;
+        balancing::red_black<TValue, TKey> balancer_;
     };
 }
 
 template <typename TValue, typename TKey>
 void containers::binary_tree<TValue, TKey>::remove(TKey key)
 {
+    // TODO: remove
+}
+
+template<typename TValue, typename TKey>
+void containers::binary_tree<TValue, TKey>::clear()
+{
     if (root_)
     {
-        root_->remove(key);
+        delete root_;
+        root_ = nullptr;
     }
 }
 
@@ -62,12 +72,7 @@ bool containers::binary_tree<TValue, TKey>::exists(TKey key) const
 template <typename TValue, typename TKey>
 void containers::binary_tree<TValue, TKey>::add(TValue value)
 {
-    if (root_)
-    {
-        root_->add(std::move(value));
-    }
-    else
-    {
-        root_ = std::make_unique<binary_node<TValue, TKey>>(value, nullptr, hash_);
-    }
+    auto node = new binary_node<TValue, TKey>(std::move(value), hash_);
+    root_ = balancer_.insert(root_, node);
+    balancer_.fix_violation(root_, node);
 }
