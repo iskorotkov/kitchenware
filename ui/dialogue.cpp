@@ -80,6 +80,18 @@ void ui::dialogue::add_new_item()
         << "[5] stove\n";
     int type;
     std::cin >> type;
+
+    int i;
+    double d;
+    bool b;
+    std::cout << "Id: ";
+    std::cin >> i;
+    if (tree_.exists(i))
+    {
+        std::cout << "\nThis item already exists\n";
+        return;
+    }
+
     std::unique_ptr<kitchen::kitchenware> kw;
     switch (type)
     {
@@ -101,21 +113,7 @@ void ui::dialogue::add_new_item()
     default:
         break;
     }
-
-    int i;
-    double d;
-    std::string s;
-    bool b;
-
-    std::cout << "Id: ";
-    std::cin >> i;
     kw->number(i);
-
-    if (tree_.exists(i))
-    {
-        std::cout << "\nThis item already exists\n";
-        return;
-    }
 
     if (auto es = dynamic_cast<kitchen::electric_stove*>(kw.get()))
     {
