@@ -20,6 +20,7 @@ void ui::dialogue::start()
     while (true)
     {
         list_all_options();
+        std::cout << "\n";
         select_option();
         std::cout << "\n";
     }
@@ -55,10 +56,11 @@ void ui::dialogue::select_option()
         //}
         break;
     case 5:
-        //for (const auto& iter : tree_.create_infix_view())
-        //{
-        //    iter->print(std::cout);
-        //}
+        for (const auto& iter : tree_.create_infix_view())
+        {
+            iter->print(std::cout);
+            std::cout << "\n";
+        }
         break;
     case 6:
         //for (const auto& iter : tree_.create_postfix_view())
@@ -73,7 +75,7 @@ void ui::dialogue::select_option()
 
 void ui::dialogue::add_new_item()
 {
-    std::cout << "Select type from list:\n" << "[1] electric stove\n"
+    std::cout << "\nSelect type from list:\n" << "[1] electric stove\n"
         << "[2] gas_stove\n" << "[3] saucepan\n" << "[4] slow cooker\n"
         << "[5] stove\n";
     int type;
@@ -132,7 +134,7 @@ void ui::dialogue::add_new_item()
 
     if (auto sc = dynamic_cast<kitchen::slow_cooker*>(kw))
     {
-        std::cout << "Is pressure cooker: ";
+        std::cout << "Is pressure cooker (0, 1): ";
         std::cin >> b;
         sc->volume(b);
     }
@@ -150,8 +152,16 @@ void ui::dialogue::add_new_item()
 
 void ui::dialogue::remove_item()
 {
+    std::cout << "\nId: ";
+    int id;
+    std::cin >> id;
+    tree_.remove(id);
 }
 
 void ui::dialogue::check_if_exists()
 {
+    std::cout << "\nId: ";
+    int id;
+    std::cin >> id;
+    std::cout << tree_.exists(id) << "\n";
 }

@@ -81,7 +81,11 @@ namespace containers::views
                 node_ = node_->parent_;
             }
         }
-        else if (node_->parent_ && node_->parent_->left_ == node_)
+        //else if (node_->parent_ && node_->parent_->left_ == node_)
+        //{
+        //    node_ = node_->parent_;
+        //}
+        else
         {
             node_ = node_->parent_;
         }
