@@ -80,23 +80,23 @@ void ui::dialogue::add_new_item()
         << "[5] stove\n";
     int type;
     std::cin >> type;
-    kitchen::kitchenware* kw;
+    std::unique_ptr<kitchen::kitchenware> kw;
     switch (type)
     {
     case 1:
-        kw = new kitchen::electric_stove();
+        kw = std::make_unique<kitchen::electric_stove>();
         break;
     case 2:
-        kw = new kitchen::gas_stove();
+        kw = std::make_unique<kitchen::gas_stove>();
         break;
     case 3:
-        kw = new kitchen::saucepan();
+        kw = std::make_unique<kitchen::saucepan>();
         break;
     case 4:
-        kw = new kitchen::slow_cooker();
+        kw = std::make_unique<kitchen::slow_cooker>();
         break;
     case 5:
-        kw = new kitchen::stove();
+        kw = std::make_unique<kitchen::stove>();
         break;
     default:
         break;
@@ -111,35 +111,41 @@ void ui::dialogue::add_new_item()
     std::cin >> i;
     kw->number(i);
 
-    if (auto es = dynamic_cast<kitchen::electric_stove*>(kw))
+    if (tree_.exists(i))
+    {
+        std::cout << "\nThis item already exists\n";
+        return;
+    }
+
+    if (auto es = dynamic_cast<kitchen::electric_stove*>(kw.get()))
     {
         std::cout << "Power: ";
         std::cin >> i;
         es->power(i);
     }
 
-    if (auto gs = dynamic_cast<kitchen::gas_stove*>(kw))
+    if (auto gs = dynamic_cast<kitchen::gas_stove*>(kw.get()))
     {
         std::cout << "Gas waste: ";
         std::cin >> i;
         gs->gas_waste(i);
     }
 
-    if (auto sp = dynamic_cast<kitchen::saucepan*>(kw))
+    if (auto sp = dynamic_cast<kitchen::saucepan*>(kw.get()))
     {
         std::cout << "Volume: ";
         std::cin >> d;
         sp->volume(d);
     }
 
-    if (auto sc = dynamic_cast<kitchen::slow_cooker*>(kw))
+    if (auto sc = dynamic_cast<kitchen::slow_cooker*>(kw.get()))
     {
         std::cout << "Is pressure cooker (0, 1): ";
         std::cin >> b;
         sc->volume(b);
     }
 
-    if (auto st = dynamic_cast<kitchen::stove*>(kw))
+    if (auto st = dynamic_cast<kitchen::stove*>(kw.get()))
     {
         std::cout << "Color (RGB, 0-255, separated by space): ";
         int color_r, color_g, color_b;
@@ -147,7 +153,7 @@ void ui::dialogue::add_new_item()
         st->color({ color_r, color_g, color_b });
     }
 
-    tree_.add(kw);
+    tree_.add(kw.release());
 }
 
 void ui::dialogue::remove_item()

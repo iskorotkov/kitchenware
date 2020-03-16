@@ -2,6 +2,7 @@
 #include <memory>
 #include "declarations.h"
 #include "binary_node.h"
+#include "value_exists_error.h"
 
 namespace containers::balancing
 {
@@ -23,8 +24,7 @@ namespace containers::balancing
             auto temp = search(root, key);
             if (temp && temp->key() == key)
             {
-                // TODO: value already exists
-                return;
+                throw errors::value_exists_error();
             }
 
             auto node = new binary_node<TValue, TKey>(value, hash);

@@ -11,6 +11,7 @@ include_directories(kitchen)
 include_directories(containers/views)
 include_directories(containers/balancing)
 include_directories(ui)
+include_directories(containers/errors)
 
 add_executable(kitchenware
         containers/binary_tree.h
@@ -35,4 +36,6 @@ add_executable(kitchenware
         containers/balancing/red_black.h
         ui/dialogue.cpp
         ui/dialogue.h
+        containers/errors/value_exists_error.cpp
+        containers/errors/value_exists_error.h
         main.cpp)
