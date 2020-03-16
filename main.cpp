@@ -1,53 +1,8 @@
 #include <iostream>
-#include "poly_tree.h"
-#include "slow_cooker.h"
-
-using namespace containers;
-using namespace kitchen;
+#include "dialogue.h"
 
 int main()
 {
-    poly_tree<kitchenware, int> poly_tree([](auto& k)
-        {
-            return k.number();
-        });
-
-    binary_tree<int, int> tree;
-    tree.add(1);
-    tree.add(200);
-    tree.add(60);
-    tree.add(300);
-    tree.add(0);
-    tree.add(-5);
-    tree.add(-4);
-
-    tree.remove(1);
-    tree.remove(-4);
-    tree.remove(60);
-
-    auto c = new slow_cooker();
-    c->power(1);
-    c->color({ 1,2,3 });
-    c->print(std::cout);
-    poly_tree.add(c);
-
-    //for (const auto& it : tree.create_prefix_view())
-    //{
-    //    //it->print(std::cout);
-    //    std::cout << it << " ";
-    //}
-
-    //std::cout << "\n";
-
-    //for (const auto& it : tree.create_postfix_view())
-    //{
-    //    std::cout << it << " ";
-    //}
-
-    //std::cout << "\n";
-
-    for (const auto& it : tree.create_infix_view())
-    {
-        std::cout << it << " ";
-    }
+    ui::dialogue dialog;
+    dialog.start();
 }
