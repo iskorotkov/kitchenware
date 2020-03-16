@@ -8,6 +8,9 @@ namespace containers
     template <typename TValue, typename TKey>
     class binary_node;
 
+    template <typename TValue, typename TKey>
+    class poly_tree;
+
     namespace balancing
     {
         template <typename TValue, typename TKey>

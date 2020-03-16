@@ -1,7 +1,8 @@
 #include <iostream>
+#include <memory>
 #include "dialogue.h"
-#include "prefix_view.h"
 #include "infix_view.h"
+#include "prefix_view.h"
 #include "postfix_view.h"
 #include "electric_stove.h"
 #include "gas_stove.h"
@@ -50,10 +51,12 @@ void ui::dialogue::select_option()
         check_if_exists();
         break;
     case 4:
-        //for (const auto& iter : tree_.create_prefix_view())
-        //{
-        //    iter->print(std::cout);
-        //}
+        containers::views::prefix_view<std::unique_ptr<kitchen::kitchenware>, int>::traverse(tree_,
+            [](const auto& kw)
+            {
+                kw->print(std::cout);
+                std::cout << "\n";
+            });
         break;
     case 5:
         for (const auto& iter : tree_.create_infix_view())
@@ -63,10 +66,12 @@ void ui::dialogue::select_option()
         }
         break;
     case 6:
-        //for (const auto& iter : tree_.create_postfix_view())
-        //{
-        //    iter->print(std::cout);
-        //}
+        containers::views::postfix_view<std::unique_ptr<kitchen::kitchenware>, int>::traverse(tree_,
+            [](const auto& kw)
+            {
+                kw->print(std::cout);
+                std::cout << "\n";
+            });
         break;
     default:
         break;

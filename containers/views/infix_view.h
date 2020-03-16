@@ -3,6 +3,7 @@
 #include "declarations.h"
 #include "binary_tree.h"
 #include "binary_node.h"
+#include "poly_tree.h"
 
 namespace containers::views
 {
@@ -51,6 +52,25 @@ namespace containers::views
 
         infix_view(const containers::binary_tree<TValue, TKey>* tree) : tree_(tree)
         {
+        }
+
+        static void traverse(const containers::binary_node<TValue, TKey>* root,
+            std::function<void(const TValue&)> func)
+        {
+            if (root == nullptr)
+            {
+                return;
+            }
+
+            traverse(root->left_);
+            func(root->value_);
+            traverse(root->right_);
+        }
+
+        static void traverse(const containers::binary_tree<TValue, TKey>& tree,
+            std::function<void(const TValue&)> func)
+        {
+            traverse(tree.root_, func);
         }
 
         auto begin() { return iterator(tree_, false); }
