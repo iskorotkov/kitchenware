@@ -62,9 +62,9 @@ namespace containers::views
                 return;
             }
 
-            traverse(root->left_);
+            traverse(root->left_, func);
             func(root->value_);
-            traverse(root->right_);
+            traverse(root->right_, func);
         }
 
         static void traverse(const containers::binary_tree<TValue, TKey>& tree,
@@ -124,10 +124,9 @@ namespace containers::views
     template <typename TValue, typename TKey>
     void infix_view<TValue, TKey>::iterator::subtree_first(const binary_node<TValue, TKey>* node)
     {
-        node_ = node;
-        while (node && node_->left_)
+        while (node && node->left_)
         {
-            node_ = node_->left_;
+            node = node->left_;
         }
     }
 

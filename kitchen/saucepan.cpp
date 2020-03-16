@@ -14,7 +14,8 @@ void kitchen::saucepan::print(std::ostream& out, bool full_output) const
 {
     if (full_output)
     {
-        kitchenware::print(out);
+        out << "saucepan\n";
+        kitchenware::print(out, false);
     }
     out << "volume = " << volume() << "\n";
 }

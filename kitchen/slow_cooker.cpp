@@ -14,8 +14,11 @@ void kitchen::slow_cooker::print(std::ostream& out, bool full_output) const
 {
     if (full_output)
     {
-        electric_stove::print(out);
+        out << "slow cooker\n";
+        kitchenware::print(out, false);
+        stove::print(out, false);
+        electric_stove::print(out, false);
         saucepan::print(out, false);
     }
-    out << "is pressure cooker = " << is_pressure_cooker() << "\n";
+    out << (is_pressure_cooker() ? "is pressure cooker" : "is not pressure cooker") << "\n";
 }

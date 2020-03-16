@@ -14,7 +14,9 @@ void kitchen::electric_stove::print(std::ostream& out, bool full_output) const
 {
     if (full_output)
     {
-        stove::print(out);
+        out << "electric stove\n";
+        kitchenware::print(out, false);
+        stove::print(out, false);
     }
     out << "power = " << power() << "\n";
 }

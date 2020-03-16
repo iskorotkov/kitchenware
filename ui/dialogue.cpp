@@ -37,6 +37,9 @@ void ui::dialogue::list_all_options()
 
 void ui::dialogue::select_option()
 {
+    using namespace containers::views;
+    using namespace kitchen;
+
     int option;
     std::cin >> option;
     switch (option)
@@ -51,7 +54,7 @@ void ui::dialogue::select_option()
         check_if_exists();
         break;
     case 4:
-        containers::views::prefix_view<std::unique_ptr<kitchen::kitchenware>, int>::traverse(tree_,
+        prefix_view<std::unique_ptr<kitchenware>, int>::traverse(tree_,
             [](const auto& kw)
             {
                 kw->print(std::cout);
@@ -59,14 +62,20 @@ void ui::dialogue::select_option()
             });
         break;
     case 5:
-        for (const auto& iter : tree_.create_infix_view())
-        {
-            iter->print(std::cout);
-            std::cout << "\n";
-        }
+        //for (const auto& iter : tree_.create_infix_view())
+        //{
+        //    iter->print(std::cout);
+        //    std::cout << "\n";
+        //}
+        infix_view<std::unique_ptr<kitchenware>, int>::traverse(tree_,
+            [](const auto& kw)
+            {
+                kw->print(std::cout);
+                std::cout << "\n";
+            });
         break;
     case 6:
-        containers::views::postfix_view<std::unique_ptr<kitchen::kitchenware>, int>::traverse(tree_,
+        postfix_view<std::unique_ptr<kitchenware>, int>::traverse(tree_,
             [](const auto& kw)
             {
                 kw->print(std::cout);
@@ -81,7 +90,7 @@ void ui::dialogue::select_option()
 void ui::dialogue::add_new_item()
 {
     std::cout << "\nSelect type from list:\n" << "[1] electric stove\n"
-        << "[2] gas_stove\n" << "[3] saucepan\n" << "[4] slow cooker\n"
+        << "[2] gas stove\n" << "[3] saucepan\n" << "[4] slow cooker\n"
         << "[5] stove\n";
     int type;
     std::cin >> type;
@@ -145,7 +154,7 @@ void ui::dialogue::add_new_item()
     {
         std::cout << "Is pressure cooker (0, 1): ";
         std::cin >> b;
-        sc->volume(b);
+        sc->is_pressure_cooker(b);
     }
 
     if (auto st = dynamic_cast<kitchen::stove*>(kw.get()))

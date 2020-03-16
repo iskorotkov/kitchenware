@@ -12,5 +12,9 @@ kitchen::kitchenware::id_t kitchen::kitchenware::number() const
 
 void kitchen::kitchenware::print(std::ostream& out, bool full_output) const
 {
+    if (full_output)
+    {
+        out << "kitchenware\n";
+    }
     out << "id = " << number() << "\n";
 }

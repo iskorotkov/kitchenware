@@ -15,7 +15,8 @@ void kitchen::stove::print(std::ostream& out, bool full_output) const
 {
     if (full_output)
     {
-        kitchenware::print(out);
+        out << "stove\n";
+        kitchenware::print(out, false);
     }
     out << "color = " << color().to_string() << "\n";
 }
