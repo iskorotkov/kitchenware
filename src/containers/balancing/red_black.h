@@ -22,6 +22,8 @@ namespace containers::balancing
         {
             auto key = hash(value);
             auto temp = search(root, key);
+
+            // Item already exists
             if (temp && temp->key() == key)
             {
                 throw errors::value_exists_error();
@@ -30,6 +32,7 @@ namespace containers::balancing
             auto node = new binary_node<TValue, TKey>(value, hash);
             if (root)
             {
+                // Root already exists -> new node isn't root
                 node->tag_ = color::red;
                 node->parent_ = temp;
                 if (key < temp->key())
@@ -44,6 +47,7 @@ namespace containers::balancing
             }
             else
             {
+                // There is no root -> new node becomes root
                 node->tag_ = color::black;
                 root = node;
             }
@@ -63,39 +67,36 @@ namespace containers::balancing
             }
         }
 
+        /// <summary>
+        /// Tries to find node with given key.
+        /// 
+        /// If search is successful, return node with given key.
+        /// If not, returns last traversed node.
+        /// </summary>
+        /// <typeparam name="root">tree root</typeparam>
+        /// <typeparam name="key">key to look for</typeparam>
         node_t* search(node_t* root, TKey key)
         {
             auto temp = root;
+            decltype(temp) last{};
             while (temp)
             {
+                last = temp;
                 if (key < temp->key())
                 {
-                    if (temp->left_ == nullptr)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        temp = temp->left_;
-                    }
+                    temp = temp->left_;
                 }
                 else if (key == temp->key())
                 {
+                    last = temp;
                     break;
                 }
                 else
                 {
-                    if (temp->right_ == nullptr)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        temp = temp->right_;
-                    }
+                    temp = temp->right_;
                 }
             }
-            return temp;
+            return last;
         }
 
         node_t* grandparent(node_t* n)
@@ -135,6 +136,11 @@ namespace containers::balancing
                 : n->parent_->left_;
         }
 
+        /// <summary>
+        /// Moves node down and moves another node in its place.
+        /// </summary>
+        /// <param name="n">node to move down</param>
+        /// <param name="n_parent">replacement node</param>
         void move_down(node_t* n, node_t* n_parent)
         {
             if (n->parent_)
@@ -258,6 +264,11 @@ namespace containers::balancing
             }
         }
 
+        /// <summary>
+        /// Find leftmost node in given subtree.
+        /// </summary>
+        /// <param name="x">root of subtree</param>
+        /// <returns>leftmost node</returns>
         node_t* successor(node_t* x)
         {
             while (x->left_ != nullptr)
@@ -267,6 +278,11 @@ namespace containers::balancing
             return x;
         }
 
+        /// <summary>
+        /// Find replacement node for node being deleted.
+        /// </summary>
+        /// <param name="x">node being deleted</param>
+        /// <returns>Replacement node</returns>
         node_t* replace(node_t* x)
         {
             if (x->left_ && x->right_)
@@ -374,11 +390,14 @@ namespace containers::balancing
                 root = u;
             }
             replace_node(v, u);
+
+            // Recursive call
             delete_node(root, v);
         }
 
         /// <summary>
-        /// Replaces given node with replacement node and nulls all pointers on given node.
+        /// Replaces given node with replacement node
+        /// and nulls all pointers on given node.
         /// </summary>
         /// <param name="node">node to be replaced</param>
         /// <param name="replacement">replacement node</param>
@@ -411,6 +430,8 @@ namespace containers::balancing
 
             if (sib == nullptr)
             {
+                // Push problem up
+                // Recursive call
                 fix_double_black(root, parent);
             }
             else
@@ -427,15 +448,18 @@ namespace containers::balancing
                     {
                         left_rotate(root, parent);
                     }
+                    // Recursive call
                     fix_double_black(root, x);
                 }
                 else
                 {
+                    // Sibling is black
                     if (has_red_child(sib))
                     {
                         if (sib->left_
                             && sib->left_->tag_ == color::red)
                         {
+                            // Left sibling child is red
                             if (is_on_left(sib))
                             {
                                 sib->left_->tag_ = sib->tag_;
@@ -451,6 +475,7 @@ namespace containers::balancing
                         }
                         else
                         {
+                            // Right sibling child is red
                             if (is_on_left(sib))
                             {
                                 sib->right_->tag_ = parent->tag_;
@@ -468,9 +493,11 @@ namespace containers::balancing
                     }
                     else
                     {
+                        // Both children are black
                         sib->tag_ = color::red;
                         if (parent->tag_ == color::black)
                         {
+                            // Recursive call
                             fix_double_black(root, parent);
                         }
                         else
