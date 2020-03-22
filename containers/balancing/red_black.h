@@ -329,6 +329,7 @@ namespace containers::balancing
             {
                 if (v == root)
                 {
+                    root = u;
                     u->left_ = v->left_;
                     u->right_ = v->right_;
                     if (v->left_)
@@ -341,8 +342,6 @@ namespace containers::balancing
                         v->right_->parent_ = u;
                         v->right_ = nullptr;
                     }
-                    v->left_ = nullptr;
-                    v->right_ = nullptr;
                     delete v;
                 }
                 else
