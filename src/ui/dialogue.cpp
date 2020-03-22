@@ -1,3 +1,10 @@
+#include "dialogue.h"
+#include "dialogue.h"
+#include "dialogue.h"
+#include "dialogue.h"
+#include "dialogue.h"
+#include "dialogue.h"
+#include "dialogue.h"
 #include <iostream>
 #include <memory>
 #include "dialogue.h"
@@ -62,11 +69,6 @@ void ui::dialogue::select_option()
             });
         break;
     case 5:
-        //for (const auto& iter : tree_.create_infix_view())
-        //{
-        //    iter->print(std::cout);
-        //    std::cout << "\n";
-        //}
         infix_view<std::unique_ptr<kitchenware>, int>::traverse(tree_,
             [](const auto& kw)
             {
@@ -95,17 +97,22 @@ void ui::dialogue::add_new_item()
     int type;
     std::cin >> type;
 
-    int i;
-    double d;
-    bool b;
     std::cout << "Id: ";
-    std::cin >> i;
-    if (tree_.exists(i))
+    int id;
+    std::cin >> id;
+    if (tree_.exists(id))
     {
         std::cout << "\nThis item already exists\n";
         return;
     }
 
+    std::unique_ptr<kitchen::kitchenware> kw = create_kitchenware(type, id);
+    set_values(kw.get());
+    tree_.add(kw.release());
+}
+
+std::unique_ptr<kitchen::kitchenware> ui::dialogue::create_kitchenware(int type, int id)
+{
     std::unique_ptr<kitchen::kitchenware> kw;
     switch (type)
     {
@@ -127,45 +134,76 @@ void ui::dialogue::add_new_item()
     default:
         break;
     }
-    kw->number(i);
+    kw->number(id);
+    return kw;
+}
 
-    if (auto es = dynamic_cast<kitchen::electric_stove*>(kw.get()))
+void ui::dialogue::set_values(kitchen::kitchenware* kw)
+{
+    if (auto es = dynamic_cast<kitchen::electric_stove*>(kw))
     {
-        std::cout << "Power: ";
-        std::cin >> i;
-        es->power(i);
+        set_power(es);
     }
 
-    if (auto gs = dynamic_cast<kitchen::gas_stove*>(kw.get()))
+    if (auto gs = dynamic_cast<kitchen::gas_stove*>(kw))
     {
-        std::cout << "Gas waste: ";
-        std::cin >> i;
-        gs->gas_waste(i);
+        set_gas_waste(gs);
     }
 
-    if (auto sp = dynamic_cast<kitchen::saucepan*>(kw.get()))
+    if (auto sp = dynamic_cast<kitchen::saucepan*>(kw))
     {
-        std::cout << "Volume: ";
-        std::cin >> d;
-        sp->volume(d);
+        set_volume(sp);
     }
 
-    if (auto sc = dynamic_cast<kitchen::slow_cooker*>(kw.get()))
+    if (auto sc = dynamic_cast<kitchen::slow_cooker*>(kw))
     {
-        std::cout << "Is pressure cooker (0, 1): ";
-        std::cin >> b;
-        sc->is_pressure_cooker(b);
+        set_is_pressure_cooker(sc);
     }
 
-    if (auto st = dynamic_cast<kitchen::stove*>(kw.get()))
+    if (auto st = dynamic_cast<kitchen::stove*>(kw))
     {
-        std::cout << "Color (RGB, 0-255, separated by space): ";
-        int color_r, color_g, color_b;
-        std::cin >> color_r >> color_g >> color_b;
-        st->color({ color_r, color_g, color_b });
+        set_color(st);
     }
+}
 
-    tree_.add(kw.release());
+void ui::dialogue::set_power(kitchen::electric_stove* es)
+{
+    std::cout << "Power: ";
+    int power;
+    std::cin >> power;
+    es->power(power);
+}
+
+void ui::dialogue::set_gas_waste(kitchen::gas_stove* gs)
+{
+    std::cout << "Gas waste: ";
+    int gas;
+    std::cin >> gas;
+    gs->gas_waste(gas);
+}
+
+void ui::dialogue::set_volume(kitchen::saucepan* sp)
+{
+    std::cout << "Volume: ";
+    double volume;
+    std::cin >> volume;
+    sp->volume(volume);
+}
+
+void ui::dialogue::set_is_pressure_cooker(kitchen::slow_cooker* sc)
+{
+    std::cout << "Is pressure cooker (0, 1): ";
+    bool is_pressure_cooker;
+    std::cin >> is_pressure_cooker;
+    sc->is_pressure_cooker(is_pressure_cooker);
+}
+
+void ui::dialogue::set_color(kitchen::stove* st)
+{
+    std::cout << "Color (RGB, 0-255, separated by space): ";
+    int red, green, blue;
+    std::cin >> red >> green >> blue;
+    st->color({ red, green, blue });
 }
 
 void ui::dialogue::remove_item()
@@ -181,5 +219,5 @@ void ui::dialogue::check_if_exists()
     std::cout << "\nId: ";
     int id;
     std::cin >> id;
-    std::cout << tree_.exists(id) << "\n";
+    std::cout << (tree_.exists(id) ? "exists" : "not exists") << "\n";
 }
