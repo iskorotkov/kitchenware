@@ -149,4 +149,39 @@ BOOST_AUTO_TEST_CASE(BigTree)
     }
 }
 
+BOOST_AUTO_TEST_CASE(GiganticTree)
+{
+    containers::binary_tree<int, int> tree;
+    std::vector<int> list;
+    for (auto i = -10000; i < 10000; ++i)
+    {
+        list.emplace_back(i);
+    }
+
+    // Populate tree
+    for (auto i : list)
+    {
+        tree.add(i);
+    }
+
+    // Check if all items were added
+    for (auto i : list)
+    {
+        BOOST_TEST_CHECK(tree.exists(i));
+    }
+
+    // Remove all items
+    for (auto i : list)
+    {
+        tree.remove(i);
+        BOOST_TEST_CHECK(!tree.exists(i));
+    }
+
+    // Check if all items were removed
+    for (auto i : list)
+    {
+        BOOST_TEST_CHECK(!tree.exists(i));
+    }
+}
+
 BOOST_AUTO_TEST_SUITE_END()
