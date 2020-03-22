@@ -69,4 +69,52 @@ BOOST_AUTO_TEST_CASE(RemoveRootWithRightLeaf)
     BOOST_TEST_CHECK(!tree.exists(3));
 }
 
+BOOST_AUTO_TEST_CASE(SymmetricHierarchy)
+{
+    containers::binary_tree<int, int> tree;
+    tree.add(50);
+    tree.add(40);
+    tree.add(30);
+    tree.add(35);
+    tree.add(45);
+    tree.add(25);
+    tree.add(55);
+    BOOST_TEST_CHECK(tree.exists(25));
+    BOOST_TEST_CHECK(tree.exists(30));
+    BOOST_TEST_CHECK(tree.exists(35));
+    BOOST_TEST_CHECK(tree.exists(40));
+    BOOST_TEST_CHECK(tree.exists(45));
+    BOOST_TEST_CHECK(tree.exists(50));
+    BOOST_TEST_CHECK(tree.exists(55));
+
+    tree.remove(30);
+    BOOST_TEST_CHECK(tree.exists(25));
+    BOOST_TEST_CHECK(!tree.exists(30));
+    BOOST_TEST_CHECK(tree.exists(35));
+    BOOST_TEST_CHECK(tree.exists(40));
+    BOOST_TEST_CHECK(tree.exists(45));
+    BOOST_TEST_CHECK(tree.exists(50));
+    BOOST_TEST_CHECK(tree.exists(55));
+
+    tree.remove(35);
+    BOOST_TEST_CHECK(tree.exists(25));
+    BOOST_TEST_CHECK(!tree.exists(30));
+    BOOST_TEST_CHECK(!tree.exists(35));
+    BOOST_TEST_CHECK(tree.exists(40));
+    BOOST_TEST_CHECK(tree.exists(45));
+    BOOST_TEST_CHECK(tree.exists(50));
+    BOOST_TEST_CHECK(tree.exists(55));
+
+    tree.remove(40);
+    tree.remove(50);
+    tree.remove(55);
+    BOOST_TEST_CHECK(tree.exists(25));
+    BOOST_TEST_CHECK(!tree.exists(30));
+    BOOST_TEST_CHECK(!tree.exists(35));
+    BOOST_TEST_CHECK(!tree.exists(40));
+    BOOST_TEST_CHECK(tree.exists(45));
+    BOOST_TEST_CHECK(!tree.exists(50));
+    BOOST_TEST_CHECK(!tree.exists(55));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

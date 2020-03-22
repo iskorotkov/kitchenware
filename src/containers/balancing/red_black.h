@@ -67,6 +67,7 @@ namespace containers::balancing
             }
         }
 
+    private:
         /// <summary>
         /// Tries to find node with given key.
         /// 
@@ -283,7 +284,7 @@ namespace containers::balancing
         /// </summary>
         /// <param name="x">node being deleted</param>
         /// <returns>Replacement node</returns>
-        node_t* replace(node_t* x)
+        node_t* find_replacement(node_t* x)
         {
             if (x->left_ && x->right_)
             {
@@ -300,7 +301,7 @@ namespace containers::balancing
 
         void delete_node(node_t*& root, node_t* v)
         {
-            auto u = replace(v);
+            auto u = find_replacement(v);
             auto uv_black = (u == nullptr || u->tag_ == color::black);
             uv_black &= (v->tag_ == color::black);
             auto parent = v->parent_;
@@ -389,7 +390,7 @@ namespace containers::balancing
             {
                 root = u;
             }
-            replace_node(v, u);
+            swap_with_child(v, u);
 
             // Recursive call
             delete_node(root, v);
@@ -403,19 +404,115 @@ namespace containers::balancing
         /// <param name="replacement">replacement node</param>
         void replace_node(node_t* node, node_t* replacement)
         {
+            // Replacement isn't left adjacent node
             if (replacement != node->left_)
             {
                 replacement->left_ = node->left_;
+                if (node->left_)
+                {
+                    node->left_->parent_ = replacement;
+                }
             }
+
+            // Replacement isn't right adjacent node
             if (replacement != node->right_)
             {
                 replacement->right_ = node->right_;
+                if (node->right_)
+                {
+                    node->right_->parent_ = replacement;
+                }
             }
 
+            // Parent nodes
             replacement->parent_ = node->parent_;
+            if (auto parent = node->parent_)
+            {
+                if (parent->left_ == node)
+                {
+                    parent->left_ = replacement;
+                }
+                else
+                {
+                    parent->right_ = replacement;
+                }
+            }
+
             node->parent_ = nullptr;
             node->left_ = nullptr;
             node->right_ = nullptr;
+        }
+
+        void swap_with_child(node_t* node, node_t* replacement)
+        {
+            auto left = replacement->left_;
+            auto right = replacement->right_;
+
+            // Save pointer to parent of replacement node
+            node_t* parent{};
+            if (replacement->parent_ == node)
+            {
+                // Nodes are adjacent -> point to new parent
+                parent = replacement;
+            }
+            else
+            {
+                // Nodes are distant
+                parent = replacement->parent_;
+            }
+
+            // Set parent node pointers
+            if (node->parent_)
+            {
+                if (node == node->parent_->left_)
+                {
+                    node->parent_->left_ = replacement;
+                }
+                else
+                {
+                    node->parent_->right_ = replacement;
+                }
+            }
+
+            // Set left/right pointers
+            if (replacement == node->left_)
+            {
+                // Replacement is left child
+                replacement->left_ = node;
+                replacement->right_ = node->right_;
+                if (node->right_)
+                {
+                    node->right_->parent_ = replacement;
+                }
+            }
+            else if (replacement == node->right_)
+            {
+                // Replacement if right child
+                replacement->left_ = node->left_;
+                replacement->right_ = node;
+                if (node->left_)
+                {
+                    node->left_->parent_ = replacement;
+                }
+            }
+            else
+            {
+                replacement->left_ = node->left_;
+                replacement->right_ = node->right_;
+                if (node->left_)
+                {
+                    node->left_->parent_ = replacement;
+                }
+                if (node->right_)
+                {
+                    node->right_->parent_ = replacement;
+                }
+            }
+
+            replacement->parent_ = node->parent_;
+            node->parent_ = parent;
+            node->left_ = left;
+            node->right_ = right;
         }
 
         void fix_double_black(node_t*& root, node_t* x)
