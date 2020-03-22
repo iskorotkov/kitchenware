@@ -1,16 +1,19 @@
 find_package (Boost COMPONENTS system filesystem unit_test_framework REQUIRED)
 
-include_directories (${TEST_SOURCE_DIR}/src
-                     ${Boost_INCLUDE_DIRS}
-                     )
+include_directories(../src/containers
+                    ../src/kitchen
+                    ../src/containers/views
+                    ../src/containers/balancing
+                    ../src/ui
+                    ../src/containers/errors
+                    ${Boost_INCLUDE_DIRS}
+                    )
 
-add_definitions (-DBOOST_TEST_DYN_LINK)
+add_definitions(-DBOOST_TEST_DYN_LINK)
 
-include_directories(containers)
-
-add_executable (kitchenware_tests
-        containers/tree_tests.cpp
-        )
+add_executable(kitchenware_tests
+               "tree_tests.cpp"
+               )
 
 target_link_libraries (kitchenware_tests
                        kitchenware_lib

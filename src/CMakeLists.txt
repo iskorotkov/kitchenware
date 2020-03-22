@@ -1,9 +1,10 @@
-include_directories(containers)
-include_directories(kitchen)
-include_directories(containers/views)
-include_directories(containers/balancing)
-include_directories(ui)
-include_directories(containers/errors)
+include_directories(containers
+                    kitchen
+                    containers/views
+                    containers/balancing
+                    ui
+                    containers/errors
+                    )
 
 add_library(kitchenware_lib
         containers/binary_tree.h
