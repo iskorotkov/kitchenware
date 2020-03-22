@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.16)
-
 include_directories(containers)
 include_directories(kitchen)
 include_directories(containers/views)
@@ -7,7 +5,7 @@ include_directories(containers/balancing)
 include_directories(ui)
 include_directories(containers/errors)
 
-add_executable(kitchenware
+add_library(kitchenware_lib
         containers/binary_tree.h
         kitchen/electric_stove.cpp
         kitchen/electric_stove.h
@@ -32,4 +30,8 @@ add_executable(kitchenware
         ui/dialogue.h
         containers/errors/value_exists_error.cpp
         containers/errors/value_exists_error.h
-        main.cpp)
+        )
+
+add_executable (kitchenware main.cpp)
+
+target_link_libraries (kitchenware kitchenware_lib)
