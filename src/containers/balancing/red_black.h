@@ -352,7 +352,7 @@ namespace containers::balancing
                 {
                     // Make u a root node
                     root = u;
-                    // Assign pointers of u and null everyting in v
+                    // Assign pointers of u and null everything in v
                     replace_node(v, u);
                     delete v;
                 }
@@ -438,6 +438,8 @@ namespace containers::balancing
                 }
             }
 
+            replacement->tag_ = node->tag_;
+
             node->parent_ = nullptr;
             node->left_ = nullptr;
             node->right_ = nullptr;
@@ -509,7 +511,30 @@ namespace containers::balancing
                 }
             }
 
+            std::swap(node->tag_, replacement->tag_);
+
             replacement->parent_ = node->parent_;
+
+            // Set pointers to node that being deleted
+            if (left)
+            {
+                left->parent_ = node;
+            }
+            if (right)
+            {
+                right->parent_ = node;
+            }
+            if (parent)
+            {
+                if (parent->left_ == replacement)
+                {
+                    parent->left_ = node;
+                }
+                else
+                {
+                    parent->right_ = node;
+                }
+            }
             node->parent_ = parent;
             node->left_ = left;
             node->right_ = right;
