@@ -289,12 +289,15 @@ namespace containers::balancing
             uv_black &= (v->tag_ == color::black);
             auto parent = v->parent_;
 
+            // Can't replace -> v is a leaf
             if (u == nullptr)
             {
+                // v is also a root -> just null the pointer
                 if (v == root)
                 {
                     root = nullptr;
                 }
+                // v is leaf, but not root
                 else
                 {
                     if (uv_black)
@@ -309,6 +312,7 @@ namespace containers::balancing
                         }
                     }
 
+                    // Null pointers to this leaf
                     if (is_on_left(v))
                     {
                         parent->left_ = nullptr;
@@ -319,33 +323,25 @@ namespace containers::balancing
                     }
                 }
 
-                v->left_ = nullptr;
-                v->right_ = nullptr;
+                // v is already a leaf
                 delete v;
                 return;
             }
 
+            // v has exactly one descendant
             if (v->left_ == nullptr || v->right_ == nullptr)
             {
                 if (v == root)
                 {
+                    // Make u a root node
                     root = u;
-                    u->left_ = v->left_;
-                    u->right_ = v->right_;
-                    if (v->left_)
-                    {
-                        v->left_->parent_ = u;
-                        v->left_ = nullptr;
-                    }
-                    if (v->right_)
-                    {
-                        v->right_->parent_ = u;
-                        v->right_ = nullptr;
-                    }
+                    // Assign pointers of u and null everyting in v
+                    replace_node(v, u);
                     delete v;
                 }
                 else
                 {
+                    // Replace v with u
                     if (is_on_left(v))
                     {
                         parent->left_ = u;
@@ -355,6 +351,7 @@ namespace containers::balancing
                         parent->right_ = u;
                     }
 
+                    // Delete v
                     v->left_ = nullptr;
                     v->right_ = nullptr;
                     delete v;
@@ -372,13 +369,34 @@ namespace containers::balancing
                 return;
             }
 
-            swap_nodes(root, u, v);
-            delete_node(root, u);
+            if (root == v)
+            {
+                root = u;
+            }
+            replace_node(v, u);
+            delete_node(root, v);
         }
 
-        void swap_nodes(node_t*& root, node_t* u, node_t* v)
+        /// <summary>
+        /// Replaces given node with replacement node and nulls all pointers on given node.
+        /// </summary>
+        /// <param name="node">node to be replaced</param>
+        /// <param name="replacement">replacement node</param>
+        void replace_node(node_t* node, node_t* replacement)
         {
-            std::swap(u->value_, v->value_);
+            if (replacement != node->left_)
+            {
+                replacement->left_ = node->left_;
+            }
+            if (replacement != node->right_)
+            {
+                replacement->right_ = node->right_;
+            }
+
+            replacement->parent_ = node->parent_;
+            node->parent_ = nullptr;
+            node->left_ = nullptr;
+            node->right_ = nullptr;
         }
 
         void fix_double_black(node_t*& root, node_t* x)
