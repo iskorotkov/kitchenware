@@ -126,7 +126,9 @@ BOOST_AUTO_TEST_CASE(BigTree)
     // Populate tree
     for (auto i : list)
     {
+        BOOST_TEST_CHECK(!tree.exists(i));
         tree.add(i);
+        BOOST_TEST_CHECK(tree.exists(i));
     }
 
     // Check if all items were added
@@ -138,6 +140,7 @@ BOOST_AUTO_TEST_CASE(BigTree)
     // Remove all items
     for (auto i : list)
     {
+        BOOST_TEST_CHECK(tree.exists(i));
         tree.remove(i);
         BOOST_TEST_CHECK(!tree.exists(i));
     }
@@ -161,7 +164,9 @@ BOOST_AUTO_TEST_CASE(GiganticTree)
     // Populate tree
     for (auto i : list)
     {
+        BOOST_TEST_CHECK(!tree.exists(i));
         tree.add(i);
+        BOOST_TEST_CHECK(tree.exists(i));
     }
 
     // Check if all items were added
@@ -173,6 +178,7 @@ BOOST_AUTO_TEST_CASE(GiganticTree)
     // Remove all items
     for (auto i : list)
     {
+        BOOST_TEST_CHECK(tree.exists(i));
         tree.remove(i);
         BOOST_TEST_CHECK(!tree.exists(i));
     }
